@@ -2,13 +2,42 @@
 
 โปรเจกต์วิเคราะห์คะแนนหนัง โดยใช้ MovieLens 32M เป็นข้อมูลคะแนนรายผู้ใช้ และ IMDb เป็นข้อมูลคะแนนสรุปอีกแหล่งหนึ่ง จุดเน้นคือการนำเข้าข้อมูล การตรวจคุณภาพ การแปลงด้วย Spark และการเตรียมตารางวิเคราะห์
 
-## สถานะปัจจุบัน
+## สิ่งที่โปรเจกต์ทำได้
 
-- ดาวน์โหลด MovieLens 32M และ IMDb (`title.ratings`, `title.basics`) ไว้ใน `data/raw/` แล้ว
+- ดาวน์โหลด MovieLens 32M และ IMDb (`title.ratings`, `title.basics`) มาเก็บใน `data/raw/`
 - มี Airflow DAG สำหรับตรวจไฟล์ แตกไฟล์ รัน PySpark โหลด PostgreSQL และตรวจผลลัพธ์
 - งาน PySpark สร้างตาราง Parquet ใน `data/processed/`
 - PostgreSQL เก็บข้อมูลที่ผ่าน cleansing ทั้งคะแนนรายคนและตารางสรุป
 - HDFS, Hive, Trino และ dashboard ยังเป็นขั้นต่อไป
+
+## รันครั้งแรกบนเครื่องใหม่
+
+ต้องมี **Git, Python 3, Make และ Docker Desktop/Engine พร้อม Docker Compose** พร้อมอินเทอร์เน็ตสำหรับดาวน์โหลด dataset และ Docker images แนะนำให้มี RAM อย่างน้อย 8 GB และพื้นที่ว่างอย่างน้อย 10 GB เพราะฐานข้อมูลคะแนน 32 ล้านแถวใช้พื้นที่หลาย GB ตรวจให้พอร์ต `8080` และ `5432` บนเครื่องว่างก่อนเริ่ม
+
+```bash
+git clone https://github.com/PhattaradanaiKru/movie-ratings-bigdata-pipeline.git
+cd movie-ratings-bigdata-pipeline
+
+make download
+make verify
+make airflow-up
+make airflow-trigger
+```
+
+1. `make download` ดึง MovieLens และ IMDb ลง `data/raw/` ซึ่ง **ไม่อยู่ใน Git** จึงต้องทำบนเครื่องใหม่
+2. `make verify` ตรวจ checksum ของ MovieLens และตรวจไฟล์ที่ต้องใช้
+3. `make airflow-up` สร้างและเปิด Airflow กับ PostgreSQL ผ่าน Compose แล้วรอ Airflow พร้อมใช้งาน
+4. `make airflow-trigger` สั่ง DAG `movie_ratings_pipeline` **หนึ่งรอบ** คำสั่งนี้ส่งงานแล้วจบทันที ให้รอจน DAG ในหน้า Airflow ขึ้น **Success** ก่อนตรวจฐานข้อมูล
+
+เปิด [Airflow](http://localhost:8080) ด้วย **username `airflow` / password `airflow`** DAG จะทำ `verify_sources → extract_movielens → spark_transform → validate_output → load_postgres → validate_database` โดยแตกไฟล์ ZIP อัตโนมัติในขั้น `extract_movielens` ไม่ต้องรัน `make extract` ก่อน
+
+หลัง DAG สำเร็จ ตรวจจำนวนข้อมูลด้วย:
+
+```bash
+make db-counts
+```
+
+ผลของ MovieLens 32M ควรเป็น **32,000,204 คะแนน** และ **87,585 เรื่อง** ค่า IMDb อาจเปลี่ยนตามวันที่ดาวน์โหลด `make airflow-down` หยุดบริการโดยเก็บข้อมูล PostgreSQL ไว้ใน Docker volume การ trigger DAG ใหม่จะสร้างผลลัพธ์และสลับตาราง PostgreSQL ใหม่ ไม่เพิ่มแถวซ้ำ
 
 ## โครงสร้าง
 
@@ -21,31 +50,11 @@ docs/                        แผนข้อมูลและการพั
 skills/                      สกิลประจำโปรเจกต์สำหรับ Codex
 ```
 
-## เตรียมข้อมูล
+## ข้อมูลและตาราง
 
-ข้อมูลถูกดาวน์โหลดไว้แล้ว หากเริ่มบนเครื่องอื่นให้ใช้:
+`make verify` ตรวจ MD5 ของ MovieLens ZIP, ตรวจว่า ZIP/GZip เปิดได้ และเช็กไฟล์ที่ต้องใช้ Spark อ่าน `ratings.csv`, `movies.csv` และ `links.csv` หลัง Airflow แตก ZIP ส่วนไฟล์ IMDb อ่านจาก GZip โดยตรง
 
-```bash
-make download
-make verify
-```
-
-`make verify` ตรวจ MD5 ของ MovieLens ZIP, ตรวจว่า ZIP/GZip เปิดได้ และเช็กไฟล์ที่ต้องใช้ ไม่ต้องแตก ZIP ด้วยมือ งาน Spark อ่าน `ratings.csv`, `movies.csv` และ `links.csv` จาก ZIP หลังคำสั่ง `make extract` ส่วนไฟล์ IMDb อ่านจาก GZip โดยตรง
-
-## รัน pipeline ผ่าน Airflow
-
-ต้องเปิด Docker Desktop ก่อน แล้วรัน:
-
-```bash
-make airflow-up
-make airflow-trigger
-```
-
-เปิด Airflow ที่ `http://localhost:8080` โดยใช้ **username `airflow` และ password `airflow`** แล้วดู DAG ชื่อ `movie_ratings_pipeline` บัญชีนี้ตั้งไว้สำหรับการพัฒนาในเครื่องเท่านั้น และหน้าเว็บเปิดเฉพาะ localhost
-
-DAG ทำงานตามลำดับ `verify_sources → extract_movielens → spark_transform → validate_output → load_postgres → validate_database` โดย Spark cleansing ข้อมูลก่อน แล้วโหลดข้อมูลลง PostgreSQL ผ่านตาราง staging จากนั้นสลับเป็นตารางจริงเมื่อโหลดครบ ตั้งให้เริ่มด้วยการ trigger เอง ไม่มีการดาวน์โหลด snapshot เดิมทุกวัน `make airflow-down` หยุด Airflow และ PostgreSQL โดยไม่ลบข้อมูลใน volume
-
-ตรวจจำนวนข้อมูลในฐานข้อมูลหลัง DAG สำเร็จด้วย `make db-counts` ตารางที่สร้างคือ `fact_ratings`, `dim_movies`, `movie_metrics` และ `genre_metrics`
+ตาราง PostgreSQL ที่ DAG สร้างคือ `fact_ratings`, `dim_movies`, `movie_metrics` และ `genre_metrics` Spark cleansing ข้อมูลก่อนแล้วโหลดผ่านตาราง staging จากนั้นสลับเป็นตารางจริงเมื่อโหลดครบ
 
 ### เปิดข้อมูลด้วย DBeaver
 
@@ -59,7 +68,9 @@ DAG ทำงานตามลำดับ `verify_sources → extract_movielen
 | Username | `movie` |
 | Password | `movie` |
 
-กด **Test Connection** แล้วเปิด schema `public` จะเห็นทั้ง 4 ตาราง พอร์ต PostgreSQL ใน Compose ผูกเฉพาะ `127.0.0.1` เพื่อให้ต่อจากเครื่องนี้ได้ หาก Docker Desktop ปิดอยู่ให้รัน `make airflow-up` ก่อน
+กด **Test Connection** แล้วเปิด schema `public` จะเห็นทั้ง 4 ตารางหลัง DAG สำเร็จ พอร์ต PostgreSQL ใน Compose ผูกเฉพาะ `127.0.0.1` เพื่อให้ต่อจากเครื่องนี้ได้ หาก Docker Desktop ปิดอยู่ให้เปิดก่อนแล้วรัน `make airflow-up`
+
+ถ้าพอร์ต `5432` ถูกโปรแกรมอื่นใช้อยู่ ให้เปลี่ยนฝั่งซ้ายของ mapping ใน `compose.yaml` จาก `127.0.0.1:5432:5432` เป็น `127.0.0.1:5433:5432` แล้วใช้พอร์ต `5433` ใน DBeaver
 
 ## รันเฉพาะ Spark โดยตรง
 
