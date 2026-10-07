@@ -1,0 +1,11 @@
+.git/
+data/raw/
+data/processed/
+data/warehouse/
+data/tmp/
+__pycache__/
+*.pyc
+.venv/
+.env
+airflow/logs/
+airflow/state/

@@ -1,0 +1,81 @@
+services:
+  airflow:
+    build:
+      context: .
+      dockerfile: airflow/Dockerfile
+    image: movie-ratings-airflow:2.10.4
+    command: ["bash", "/workspace/airflow/start.sh"]
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+      AIRFLOW__CORE__DAGS_ARE_PAUSED_AT_CREATION: "false"
+      AIRFLOW__WEBSERVER__WORKERS: "1"
+      AIRFLOW__WEBSERVER__WEB_SERVER_MASTER_TIMEOUT: "300"
+      AIRFLOW_UI_USERNAME: airflow
+      AIRFLOW_UI_PASSWORD: airflow
+      PYTHONPATH: /workspace/src
+      SPARK_MASTER: ${SPARK_MASTER:-local[2]}
+      SPARK_DRIVER_MEMORY: ${SPARK_DRIVER_MEMORY:-4g}
+      SPARK_SHUFFLE_PARTITIONS: ${SPARK_SHUFFLE_PARTITIONS:-16}
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: movie_ratings
+      POSTGRES_USER: movie
+      POSTGRES_PASSWORD: movie
+    volumes:
+      - airflow-home:/opt/airflow
+      - ./airflow/start.sh:/workspace/airflow/start.sh:ro
+      - ./airflow/dags:/opt/airflow/dags:ro
+      - ./src:/workspace/src:ro
+      - ./data:/workspace/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl --fail --silent http://localhost:8080/health > /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  postgres:
+    image: postgres:16
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_DB: movie_ratings
+      POSTGRES_USER: movie
+      POSTGRES_PASSWORD: movie
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U movie -d movie_ratings"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  spark-transform:
+    image: spark:3.5.3
+    working_dir: /workspace
+    init: true
+    environment:
+      HOME: /tmp
+      SPARK_SUBMIT_OPTS: -Duser.home=/tmp
+      PYTHONPATH: /workspace/src
+      SPARK_MASTER: ${SPARK_MASTER:-local[*]}
+      SPARK_DRIVER_MEMORY: ${SPARK_DRIVER_MEMORY:-4g}
+      SPARK_SHUFFLE_PARTITIONS: ${SPARK_SHUFFLE_PARTITIONS:-16}
+    volumes:
+      - ./:/workspace
+    command:
+      - /opt/spark/bin/spark-submit
+      - --master
+      - ${SPARK_MASTER:-local[*]}
+      - --driver-memory
+      - ${SPARK_DRIVER_MEMORY:-4g}
+      - /workspace/src/movie_pipeline/transform.py
+
+volumes:
+  airflow-home:
+  postgres-data:

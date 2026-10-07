@@ -1,0 +1,33 @@
+# Downloaded datasets and generated outputs
+/data/raw/
+/data/processed/
+/data/warehouse/
+/data/tmp/
+/airflow/logs/
+/airflow/state/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+
+# Python and tooling
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Spark/Hadoop local state
+spark-warehouse/
+metastore_db/
+derby.log
+*.crc
+
+# Operating system and editor
+.DS_Store
+.idea/
+.vscode/
