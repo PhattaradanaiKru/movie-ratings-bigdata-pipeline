@@ -58,13 +58,14 @@ IMDB_BASICS_SCHEMA = T.StructType(
 
 
 def csv(spark: SparkSession, path: Path, schema: T.StructType, *, sep: str = ","):
-    return (
-        spark.read.option("header", "true")
-        .option("sep", sep)
-        .option("nullValue", r"\N")
-        .schema(schema)
-        .csv(str(path))
-    )
+    reader = spark.read.option("header", "true").option("sep", sep).option("nullValue", r"\N")
+    if sep == "\t":
+        # IMDb TSV is unquoted; titles that start with '"' must not swallow the next columns.
+        reader = reader.option("quote", "\u0000")
+    else:
+        # MovieLens CSV escapes quotes inside quoted titles by doubling them.
+        reader = reader.option("escape", '"')
+    return reader.schema(schema).csv(str(path))
 
 
 def main() -> None:
@@ -100,12 +101,13 @@ def main() -> None:
         movies = csv(spark, movie_dir / "movies.csv", MOVIES_SCHEMA).dropDuplicates(["movieId"])
         links = csv(spark, movie_dir / "links.csv", LINKS_SCHEMA).dropDuplicates(["movieId"])
         imdb_ratings = csv(spark, IMDB / "title.ratings.tsv.gz", IMDB_RATINGS_SCHEMA, sep="\t")
+        # MovieLens links also point at TV movies, series and shorts, so keep every IMDb title type.
         imdb_basics = (
             csv(spark, IMDB / "title.basics.tsv.gz", IMDB_BASICS_SCHEMA, sep="\t")
-            .filter(F.col("titleType") == "movie")
-            .select("tconst", F.col("startYear").cast("int").alias("release_year"),
+            .select("tconst", F.col("startYear").cast("int").alias("imdb_release_year"),
                     F.col("runtimeMinutes").cast("int").alias("runtime_minutes"))
         )
+        title_year = F.regexp_extract("title", r"\((\d{4})\)\s*$", 1)
 
         imdb_id = F.when(F.length("imdbId") < 7, F.lpad("imdbId", 7, "0")).otherwise(F.col("imdbId"))
         dim_movies = (
@@ -113,6 +115,8 @@ def main() -> None:
             .withColumn("tconst", F.when(F.col("imdbId").isNotNull(), F.concat(F.lit("tt"), imdb_id)))
             .join(imdb_basics, "tconst", "left")
             .join(imdb_ratings, "tconst", "left")
+            .withColumn("release_year", F.coalesce(
+                "imdb_release_year", F.when(title_year != "", title_year.cast("int"))))
             .select(
                 "movieId", "title", "genres", "imdbId", "tmdbId", "tconst",
                 "release_year", "runtime_minutes",

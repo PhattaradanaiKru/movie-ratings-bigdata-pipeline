@@ -268,6 +268,7 @@ def publish(db, grosses, wikidata, oscars, api_snapshots: list[Path]) -> dict[st
             )
             cursor.execute("DROP VIEW IF EXISTS public.powerbi_box_office")
             cursor.execute("DROP VIEW IF EXISTS public.powerbi_wikidata_movies")
+            cursor.execute("DROP VIEW IF EXISTS public.powerbi_wikidata_countries")
             cursor.execute("DROP VIEW IF EXISTS public.powerbi_oscars_awards")
             cursor.execute("DROP VIEW IF EXISTS public.powerbi_oscars_movies")
             cursor.execute(Path(__file__).with_name("external_views.sql").read_text(encoding="utf-8"))

@@ -34,6 +34,22 @@ LEFT JOIN (
     GROUP BY imdb_id
 ) AS api ON movie.tconst = api.imdb_id;
 
+-- One row per movie and producing country, so co-productions count in each country.
+CREATE VIEW public.powerbi_wikidata_countries AS
+WITH countries AS (
+    -- api_wikidata_films stores each film's countries as one '; '-joined label list.
+    SELECT DISTINCT api.imdb_id, trim(country.name) AS country
+    FROM public.api_wikidata_films AS api
+    CROSS JOIN LATERAL unnest(string_to_array(api.country_of_origin, ';')) AS country(name)
+    WHERE trim(country.name) <> ''
+)
+SELECT movie.movie_id, countries.country,
+       count(*) OVER (PARTITION BY movie.movie_id) AS movie_country_count,
+       movie.movielens_rating_count, movie.movielens_average_rating,
+       movie.imdb_vote_count, movie.imdb_average_rating
+FROM public.movie_metrics AS movie
+JOIN countries ON movie.tconst = countries.imdb_id;
+
 CREATE VIEW public.powerbi_oscars_movies AS
 WITH awards AS (
     SELECT ceremony_year, film_title,

@@ -35,6 +35,12 @@ Compose เตรียมโฟลเดอร์ข้อมูล เปิ�
 make db-counts
 ```
 
+บน Windows ที่ไม่มี `make` ใช้คำสั่งเดียวกันผ่าน Docker:
+
+```bash
+docker compose exec -T postgres psql -U movie -d movie_ratings -c "SELECT (SELECT count(*) FROM fact_ratings) AS ratings, (SELECT count(*) FROM dim_movies) AS movies;"
+```
+
 ผลของ MovieLens 32M ควรเป็น **32,000,204 คะแนน** และ **87,585 เรื่อง** ค่า IMDb อาจเปลี่ยนตามวันที่ดาวน์โหลด `make airflow-down` หยุดบริการโดยเก็บข้อมูล PostgreSQL ไว้ใน Docker volume การ trigger DAG ใหม่จะสร้างผลลัพธ์และสลับตาราง PostgreSQL ใหม่ ไม่เพิ่มแถวซ้ำ
 
 ## โครงสร้าง
@@ -72,7 +78,7 @@ task `verify_sources` ตรวจ MD5 ของ MovieLens ZIP, ตรวจว�
 | Username | `movie` |
 | Password | `movie` |
 
-กด **Test Connection** แล้วเปิด schema `public` จะเห็นทั้ง 4 ตารางหลัง DAG สำเร็จ พอร์ต PostgreSQL ใน Compose ผูกเฉพาะ `127.0.0.1` เพื่อให้ต่อจากเครื่องนี้ได้ หาก Docker Desktop ปิดอยู่ให้เปิดก่อนแล้วรัน `make airflow-up`
+กด **Test Connection** แล้วเปิด schema `public` จะเห็นตารางหลัก 4 ตาราง (`fact_ratings`, `dim_movies`, `movie_metrics`, `genre_metrics`) ตารางข้อมูลภายนอก 3 ตาราง และ views `powerbi_*` หลัง DAG สำเร็จ พอร์ต PostgreSQL ใน Compose ผูกเฉพาะ `127.0.0.1` เพื่อให้ต่อจากเครื่องนี้ได้ หาก Docker Desktop ปิดอยู่ให้เปิดก่อนแล้วรัน `make airflow-up`
 
 ถ้าพอร์ต `5432` ถูกโปรแกรมอื่นใช้อยู่ ให้เปลี่ยนฝั่งซ้ายของ mapping ใน `compose.yaml` จาก `127.0.0.1:5432:5432` เป็น `127.0.0.1:5433:5432` แล้วใช้พอร์ต `5433` ใน DBeaver
 

@@ -14,6 +14,7 @@ OUTPUT = ROOT / "data" / "processed"
 TABLES = ("dim_movies", "movie_metrics", "genre_metrics", "fact_ratings")
 POWERBI_VIEWS = ("powerbi_overview", "powerbi_movies", "powerbi_release_year", "powerbi_genres")
 POWERBI_SQL = Path(__file__).with_name("powerbi_views.sql")
+EXTERNAL_SQL = Path(__file__).with_name("external_views.sql")
 JDBC_URL = (
     f"jdbc:postgresql://{os.getenv('POSTGRES_HOST', 'postgres')}:"
     f"{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'movie_ratings')}"
@@ -102,6 +103,7 @@ def main() -> None:
             # transaction as the swap so readers never see a partial refresh.
             cursor.execute("DROP VIEW IF EXISTS public.powerbi_box_office")
             cursor.execute("DROP VIEW IF EXISTS public.powerbi_wikidata_movies")
+            cursor.execute("DROP VIEW IF EXISTS public.powerbi_wikidata_countries")
             cursor.execute("DROP VIEW IF EXISTS public.powerbi_oscars_awards")
             cursor.execute("DROP VIEW IF EXISTS public.powerbi_oscars_movies")
             for name in POWERBI_VIEWS:
@@ -117,6 +119,12 @@ def main() -> None:
             cursor.execute("CREATE UNIQUE INDEX dim_movies_movie_id_idx ON public.dim_movies (movie_id)")
             cursor.execute("CREATE UNIQUE INDEX movie_metrics_movie_id_idx ON public.movie_metrics (movie_id)")
             cursor.execute(POWERBI_SQL.read_text(encoding="utf-8"))
+            # Keep earlier external enrichments visible until the next external publish replaces them.
+            cursor.execute("SELECT to_regclass('public.web_top_grossing_films') IS NOT NULL "
+                           "AND to_regclass('public.api_wikidata_films') IS NOT NULL "
+                           "AND to_regclass('public.oscars_awards') IS NOT NULL")
+            if cursor.fetchone()[0]:
+                cursor.execute(EXTERNAL_SQL.read_text(encoding="utf-8"))
 
     with db_connection() as connection:
         connection.autocommit = True
