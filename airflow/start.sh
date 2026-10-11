@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# PID files persist in the airflow-home volume; after an unclean stop they
+# block the webserver from starting in the new container.
+rm -f "${AIRFLOW_HOME:-/opt/airflow}"/airflow-*.pid
+
 airflow db migrate
 
 if ! airflow users create \
