@@ -10,9 +10,10 @@ from pathlib import Path
 
 from airflow import DAG
 from airflow.operators.python import PythonOperator
+from airflow.utils.task_group import TaskGroup
 import psycopg2
 
-from movie_pipeline.sources import extract, verify
+from movie_pipeline.sources import download, extract, verify
 
 
 def run_spark_script(script: str, *, jdbc: bool = False) -> None:
@@ -40,9 +41,9 @@ def load_database() -> None:
     run_spark_script("load_postgres.py", jdbc=True)
 
 
-def load_external_sources() -> None:
+def run_external_step(step: str) -> None:
     subprocess.run(
-        ["python", "/workspace/src/movie_pipeline/external_sources.py"],
+        ["python", "/workspace/src/movie_pipeline/external_sources.py", "--step", step],
         check=True,
         env={**os.environ, "PYTHONPATH": "/workspace/src"},
     )
@@ -100,20 +101,38 @@ def check_database() -> None:
 
 with DAG(
     dag_id="movie_ratings_pipeline",
-    description="Verify sources, cleanse with Spark, load PostgreSQL, and check output",
+    description="Download sources, cleanse with Spark, load PostgreSQL, and enrich movies",
     start_date=datetime(2024, 1, 1, tzinfo=timezone.utc),
-    schedule=None,
+    schedule="@once",
     catchup=False,
     max_active_runs=1,
-    default_args={"retries": 1, "retry_delay": timedelta(minutes=2)},
+    default_args={"retries": 3, "retry_delay": timedelta(minutes=2)},
     tags=["big-data", "movie-ratings"],
 ) as dag:
+    download_sources = PythonOperator(task_id="download_sources", python_callable=download)
     verify_sources = PythonOperator(task_id="verify_sources", python_callable=verify)
     extract_movielens = PythonOperator(task_id="extract_movielens", python_callable=extract)
     spark_transform = PythonOperator(task_id="spark_transform", python_callable=run_spark_transform)
     validate_output = PythonOperator(task_id="validate_output", python_callable=check_quality)
     load_postgres = PythonOperator(task_id="load_postgres", python_callable=load_database)
     validate_database = PythonOperator(task_id="validate_database", python_callable=check_database)
-    enrich_external = PythonOperator(task_id="enrich_external", python_callable=load_external_sources)
+    with TaskGroup(group_id="external_enrichment", tooltip="Fetch and load external movie data") as external_enrichment:
+        fetch_wikipedia = PythonOperator(
+            task_id="fetch_wikipedia_box_office", python_callable=run_external_step,
+            op_kwargs={"step": "wikipedia"},
+        )
+        fetch_wikidata = PythonOperator(
+            task_id="fetch_wikidata_movie_details", python_callable=run_external_step,
+            op_kwargs={"step": "wikidata"},
+        )
+        fetch_oscars = PythonOperator(
+            task_id="fetch_oscars_awards", python_callable=run_external_step,
+            op_kwargs={"step": "oscars"},
+        )
+        publish_external = PythonOperator(
+            task_id="publish_external_to_postgres", python_callable=run_external_step,
+            op_kwargs={"step": "publish"},
+        )
+        [fetch_wikipedia, fetch_wikidata, fetch_oscars] >> publish_external
 
-    verify_sources >> extract_movielens >> spark_transform >> validate_output >> load_postgres >> validate_database >> enrich_external
+    download_sources >> verify_sources >> extract_movielens >> spark_transform >> validate_output >> load_postgres >> validate_database >> external_enrichment

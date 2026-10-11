@@ -2,9 +2,9 @@
 
 ## Current stage: local Airflow + Spark + PostgreSQL batch pipeline
 
-Airflow orchestrates source verification, MovieLens extraction, a local PySpark transform, output quality checks, PostgreSQL loading, and database count checks. Source files stay in `data/raw/`. The transform reads MovieLens CSV and IMDb GZip TSV, writes Parquet tables to `data/processed/`, then loads cleaned tables into PostgreSQL through staging tables.
+On first `docker compose up --build -d`, Airflow schedules the DAG once. It downloads MovieLens and IMDb, verifies sources, extracts MovieLens, runs a local PySpark transform, checks output quality, loads PostgreSQL, and checks database counts. Source files stay in `data/raw/`. The transform reads MovieLens CSV and IMDb GZip TSV, writes Parquet tables to `data/processed/`, then loads cleaned tables into PostgreSQL through staging tables. Subsequent Compose starts reuse the Airflow metadata volume and do not schedule another run.
 
-An enrichment task also scrapes a Wikipedia box-office table, calls the Wikidata SPARQL API for every MovieLens film with an IMDb ID in sequential cached batches, and imports a pinned historical Oscars CSV derived from Academy web pages. It caches raw responses in `data/raw/external/`, publishes separate PostgreSQL tables and Power BI views, and reports match coverage. This enrichment does not change the 32M-row rating fact table.
+The `external_enrichment` task group separates Wikipedia box-office scraping, sequential cached Wikidata SPARQL API batches for every MovieLens film with an IMDb ID, and importing a pinned historical Oscars CSV derived from Academy web pages. These three fetch tasks run independently; a final publish task checks their snapshots and loads separate PostgreSQL tables and Power BI views with match coverage. Raw responses stay in `data/raw/external/`. This enrichment does not change the 32M-row rating fact table.
 
 ## Next infrastructure stage
 

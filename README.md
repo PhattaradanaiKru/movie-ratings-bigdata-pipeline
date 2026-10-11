@@ -10,28 +10,23 @@
 - PostgreSQL เก็บข้อมูลที่ผ่าน cleansing ทั้งคะแนนรายคนและตารางสรุป
 - มี PostgreSQL views สำหรับเชื่อม Power BI; HDFS, Hive และ Trino เป็นขั้นโครงสร้างพื้นฐานถัดไปหากวิชากำหนด
 - ดึงข้อมูลเพิ่มจาก Wikipedia ด้วย web scraping และ Wikidata ผ่าน API เพื่อใช้วิเคราะห์รายได้และประเทศต้นทางของหนัง
+- มี [ตัวอย่าง CSV จาก web scraping ของ Wikipedia](data/scraped/wikipedia_highest_grossing.csv) ใน Git พร้อม [แหล่งที่มาและเงื่อนไขการใช้](data/scraped/README.md)
 - นำเข้าชุดข้อมูลผู้เข้าชิงและผู้ชนะ Oscar จากไฟล์ Oscars-Data ซึ่งผู้เผยแพร่รวบรวมจากเว็บ Academy
 
 ## รันครั้งแรกบนเครื่องใหม่
 
-ต้องมี **Git, Python 3, Make และ Docker Desktop/Engine พร้อม Docker Compose** พร้อมอินเทอร์เน็ตสำหรับดาวน์โหลด dataset และ Docker images แนะนำให้มี RAM อย่างน้อย 8 GB และพื้นที่ว่างอย่างน้อย 10 GB เพราะฐานข้อมูลคะแนน 32 ล้านแถวใช้พื้นที่หลาย GB ตรวจให้พอร์ต `8080` และ `5432` บนเครื่องว่างก่อนเริ่ม
+ต้องมี **Git และ Docker Desktop/Engine พร้อม Docker Compose** พร้อมอินเทอร์เน็ตสำหรับดาวน์โหลด dataset และ Docker images แนะนำให้มี RAM อย่างน้อย 8 GB และพื้นที่ว่างอย่างน้อย 10 GB เพราะฐานข้อมูลคะแนน 32 ล้านแถวใช้พื้นที่หลาย GB ตรวจให้พอร์ต `8080` และ `5432` บนเครื่องว่างก่อนเริ่ม
 
 ```bash
 git clone https://github.com/PhattaradanaiKru/movie-ratings-bigdata-pipeline.git
 cd movie-ratings-bigdata-pipeline
 
-make download
-make verify
-make airflow-up
-make airflow-trigger
+docker compose up --build -d
 ```
 
-1. `make download` ดึง MovieLens และ IMDb ลง `data/raw/` ซึ่ง **ไม่อยู่ใน Git** จึงต้องทำบนเครื่องใหม่
-2. `make verify` ตรวจ checksum ของ MovieLens และตรวจไฟล์ที่ต้องใช้
-3. `make airflow-up` สร้างและเปิด Airflow กับ PostgreSQL ผ่าน Compose แล้วรอ Airflow พร้อมใช้งาน
-4. `make airflow-trigger` สั่ง DAG `movie_ratings_pipeline` **หนึ่งรอบ** คำสั่งนี้ส่งงานแล้วจบทันที ให้รอจน DAG ในหน้า Airflow ขึ้น **Success** ก่อนตรวจฐานข้อมูล
+Compose เตรียมโฟลเดอร์ข้อมูล เปิด PostgreSQL และ Airflow จากนั้น Airflow สร้าง DAG run อัตโนมัติ **หนึ่งรอบต่อ Airflow metadata volume** งานใน DAG ดาวน์โหลด MovieLens/IMDb ลง `data/raw/`, ตรวจไฟล์, แปลงข้อมูล และโหลด PostgreSQL โดยไม่ต้องติดตั้ง Python หรือ Make บนเครื่องโฮสต์ คำสั่ง `up -d` กลับมาทันที แต่งานดาวน์โหลดและประมวลผลยังทำต่อเบื้องหลัง ให้รอ DAG ในหน้า Airflow ขึ้น **Success** ก่อนตรวจฐานข้อมูล การสั่ง `docker compose up -d` อีกครั้งโดยยังเก็บ volumes เดิมจะไม่สร้าง DAG run ใหม่
 
-เปิด [Airflow](http://localhost:8080) ด้วย **username `airflow` / password `airflow`** DAG จะทำ `verify_sources → extract_movielens → spark_transform → validate_output → load_postgres → validate_database → enrich_external` โดยแตกไฟล์ ZIP อัตโนมัติในขั้น `extract_movielens` ไม่ต้องรัน `make extract` ก่อน ขั้น `enrich_external` ต้องใช้อินเทอร์เน็ตเพื่อดึง snapshot ของ Wikipedia, Wikidata และ Oscars ในครั้งแรก Wikidata สอบถาม IMDb IDs ทั้ง 87,585 เรื่องแบบทยอยเรียก จึงอาจใช้เวลาหลายนาทีและรันต่อจาก snapshot ได้หากงานสะดุด
+เปิด [Airflow](http://localhost:8080) ด้วย **username `airflow` / password `airflow`** DAG จะทำ `download_sources → verify_sources → extract_movielens → spark_transform → validate_output → load_postgres → validate_database → external_enrichment` ขยายกลุ่ม `external_enrichment` ในหน้า Graph จะเห็น `fetch_wikipedia_box_office`, `fetch_wikidata_movie_details` และ `fetch_oscars_awards` ทำงานแยกกัน ก่อน `publish_external_to_postgres` ตรวจ snapshot และโหลดข้อมูลลงฐานข้อมูล งานดึงข้อมูลต้องใช้อินเทอร์เน็ตในครั้งแรก Wikidata สอบถาม IMDb IDs ทั้ง 87,585 เรื่องแบบทยอยเรียก จึงอาจใช้เวลาหลายนาทีและรันต่อจาก snapshot ได้หากงานสะดุด หาก task ล้มเหลวหลัง retry ให้แก้สาเหตุแล้วกด Clear task ใน Airflow หรือสั่ง `make airflow-trigger` เพื่อรันใหม่ด้วยมือ
 
 หลัง DAG สำเร็จ ตรวจจำนวนข้อมูลด้วย:
 
@@ -54,7 +49,7 @@ skills/                      สกิลประจำโปรเจกต์
 
 ## ข้อมูลและตาราง
 
-`make verify` ตรวจ MD5 ของ MovieLens ZIP, ตรวจว่า ZIP/GZip เปิดได้ และเช็กไฟล์ที่ต้องใช้ Spark อ่าน `ratings.csv`, `movies.csv` และ `links.csv` หลัง Airflow แตก ZIP ส่วนไฟล์ IMDb อ่านจาก GZip โดยตรง
+task `verify_sources` ตรวจ MD5 ของ MovieLens ZIP, ตรวจว่า ZIP/GZip เปิดได้ และเช็กไฟล์ที่ต้องใช้ Spark อ่าน `ratings.csv`, `movies.csv` และ `links.csv` หลัง Airflow แตก ZIP ส่วนไฟล์ IMDb อ่านจาก GZip โดยตรง
 
 ตาราง PostgreSQL ที่ DAG สร้างคือ `fact_ratings`, `dim_movies`, `movie_metrics` และ `genre_metrics` Spark cleansing ข้อมูลก่อนแล้วโหลดผ่านตาราง staging จากนั้นสลับเป็นตารางจริงเมื่อโหลดครบ
 

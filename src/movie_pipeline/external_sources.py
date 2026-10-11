@@ -284,6 +284,9 @@ def publish(db, grosses, wikidata, oscars, api_snapshots: list[Path]) -> dict[st
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--step", choices=("all", "wikipedia", "wikidata", "oscars", "publish",
+                                           "export-wikipedia"),
+                        default="all", help="Run one Airflow stage or the full standalone refresh")
     parser.add_argument("--api-limit", type=int, default=None,
                         help="Optional development limit; default queries every IMDb ID")
     parser.add_argument("--api-batch-size", type=int, default=200)
@@ -292,15 +295,61 @@ def main() -> None:
         parser.error("--api-limit must be positive")
     if not 1 <= args.api_batch_size <= 200:
         parser.error("--api-batch-size must be between 1 and 200")
-    html = snapshot(SNAPSHOT_DIR / "wikipedia_highest_grossing.html", WIKIPEDIA_URL, accept="text/html")
+    web_path = SNAPSHOT_DIR / "wikipedia_highest_grossing.html"
+    oscars_path = SNAPSHOT_DIR / "oscars-data.csv"
+    if args.step == "export-wikipedia":
+        html = snapshot(web_path, WIKIPEDIA_URL, accept="text/html")
+        destination = ROOT / "data" / "scraped" / "wikipedia_highest_grossing.csv"
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        temporary = destination.with_suffix(".csv.part")
+        with temporary.open("w", encoding="utf-8", newline="") as output:
+            writer = csv.writer(output, lineterminator="\n")
+            writer.writerow(("rank", "title", "worldwide_gross_usd", "release_year"))
+            writer.writerows(scrape_grosses(html))
+        temporary.replace(destination)
+        print(f"Exported scraped Wikipedia rows to {destination}")
+        return
+    if args.step in ("all", "wikipedia"):
+        html = snapshot(web_path, WIKIPEDIA_URL, accept="text/html")
+        scrape_grosses(html)
+        if args.step == "wikipedia":
+            print(f"Wikipedia snapshot ready: {web_path}")
+            return
+    if args.step in ("all", "oscars"):
+        oscars_data = snapshot(oscars_path, OSCARS_URL, accept="text/csv")
+        parse_oscars(oscars_data)
+        if args.step == "oscars":
+            print(f"Oscars snapshot ready: {oscars_path}")
+            return
+    if args.step in ("all", "wikidata"):
+        with closing(connection()) as db:
+            ids = selected_imdb_ids(db, args.api_limit)
+        wikidata = fetch_wikidata(ids, batch_size=args.api_batch_size)
+        if not wikidata:
+            raise ValueError("Wikidata API returned no matching films")
+        if args.step == "wikidata":
+            print(f"Wikidata snapshots ready: {len(ids)} IMDb IDs, "
+                  f"{len({imdb for imdb, _, _ in wikidata})} matched")
+            return
+    else:
+        with closing(connection()) as db:
+            ids = selected_imdb_ids(db, args.api_limit)
+        # publish reads only the snapshots prepared by the upstream Airflow tasks.
+        paths = [wikidata_snapshot_path(ids[offset:offset + args.api_batch_size],
+                                        offset // args.api_batch_size)
+                 for offset in range(0, len(ids), args.api_batch_size)]
+        missing = [path for path in paths if not path.is_file()]
+        if missing:
+            raise FileNotFoundError(f"Missing {len(missing)} Wikidata snapshots; run --step wikidata first")
+        wikidata = fetch_wikidata(ids, batch_size=args.api_batch_size)
+    if args.step == "publish":
+        for path in (web_path, oscars_path):
+            if not path.is_file():
+                raise FileNotFoundError(f"Missing source snapshot: {path}")
+    html = web_path.read_bytes()
     grosses = scrape_grosses(html)
-    oscars_data = snapshot(SNAPSHOT_DIR / "oscars-data.csv", OSCARS_URL, accept="text/csv")
+    oscars_data = oscars_path.read_bytes()
     oscars = parse_oscars(oscars_data)
-    with closing(connection()) as db:
-        ids = selected_imdb_ids(db, args.api_limit)
-    wikidata = fetch_wikidata(ids, batch_size=args.api_batch_size)
-    if not wikidata:
-        raise ValueError("Wikidata API returned no matching films")
     api_snapshots = [wikidata_snapshot_path(ids[offset:offset + args.api_batch_size],
                                            offset // args.api_batch_size)
                      for offset in range(0, len(ids), args.api_batch_size)]

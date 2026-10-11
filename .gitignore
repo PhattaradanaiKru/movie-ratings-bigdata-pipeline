@@ -3,6 +3,7 @@
 /data/processed/
 /data/warehouse/
 /data/tmp/
+/data/scraped/*.part
 /airflow/logs/
 /airflow/state/
 

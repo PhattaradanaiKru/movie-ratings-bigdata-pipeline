@@ -33,6 +33,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      data-init:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD-SHELL", "curl --fail --silent http://localhost:8080/health > /dev/null"]
       interval: 10s
@@ -56,7 +58,15 @@ services:
       timeout: 3s
       retries: 20
 
+  data-init:
+    image: postgres:16
+    command: ["sh", "-c", "mkdir -p /workspace/data/raw /workspace/data/processed /workspace/data/scraped && chmod 0777 /workspace/data/raw /workspace/data/processed /workspace/data/scraped"]
+    volumes:
+      - ./data:/workspace/data
+    restart: "no"
+
   spark-transform:
+    profiles: ["manual"]
     image: spark:3.5.3
     working_dir: /workspace
     init: true
