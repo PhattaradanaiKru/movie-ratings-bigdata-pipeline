@@ -16,16 +16,14 @@ import psycopg2
 from movie_pipeline.sources import download, extract, verify
 
 
-def run_spark_script(script: str, *, jdbc: bool = False) -> None:
+def run_spark_script(script: str) -> None:
     """Run a PySpark job inside the Airflow container."""
-    command = ["spark-submit"]
-    if jdbc:
-        command.extend(["--jars", "/usr/share/java/postgresql.jar"])
-    command.extend([
-        "--master", os.getenv("SPARK_MASTER", "local[4]"),
+    command = [
+        "spark-submit",
+        "--master", os.getenv("SPARK_MASTER", "local[*]"),
         "--driver-memory", os.getenv("SPARK_DRIVER_MEMORY", "4g"),
         f"/workspace/src/movie_pipeline/{script}",
-    ])
+    ]
     subprocess.run(
         command,
         check=True,
@@ -38,7 +36,7 @@ def run_spark_transform() -> None:
 
 
 def load_database() -> None:
-    run_spark_script("load_postgres.py", jdbc=True)
+    run_spark_script("load_postgres.py")
 
 
 def run_external_step(step: str) -> None:

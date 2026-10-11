@@ -3,10 +3,13 @@
 from __future__ import annotations
 
 import os
+import shutil
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
 from pathlib import Path
 
 import psycopg2
-from pyspark.sql import SparkSession, functions as F
+from pyspark.sql import SparkSession, functions as F, types as T
 
 from movie_pipeline.sources import ROOT
 
@@ -15,10 +18,16 @@ TABLES = ("dim_movies", "movie_metrics", "genre_metrics", "fact_ratings")
 POWERBI_VIEWS = ("powerbi_overview", "powerbi_movies", "powerbi_release_year", "powerbi_genres")
 POWERBI_SQL = Path(__file__).with_name("powerbi_views.sql")
 EXTERNAL_SQL = Path(__file__).with_name("external_views.sql")
-JDBC_URL = (
-    f"jdbc:postgresql://{os.getenv('POSTGRES_HOST', 'postgres')}:"
-    f"{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'movie_ratings')}"
-)
+# Spark writes CSV parts here; parallel COPY streams load them far faster than JDBC inserts.
+COPY_STAGE = OUTPUT / "_postgres_load"
+COPY_WORKERS = 4
+POSTGRES_TYPES = {
+    T.LongType: "bigint",
+    T.IntegerType: "integer",
+    T.DoubleType: "double precision",
+    T.StringType: "text",
+    T.TimestampType: "timestamp",
+}
 
 
 def db_connection():
@@ -61,6 +70,17 @@ def table_frame(spark: SparkSession, name: str):
     )
 
 
+def create_staging_table(cursor, name: str, schema: T.StructType) -> None:
+    columns = ", ".join(f"{field.name} {POSTGRES_TYPES[type(field.dataType)]}" for field in schema.fields)
+    cursor.execute(f"DROP TABLE IF EXISTS public.{name}_load")
+    cursor.execute(f"CREATE TABLE public.{name}_load ({columns})")
+
+
+def copy_part(name: str, path: Path) -> None:
+    with closing(db_connection()) as connection, connection, connection.cursor() as cursor, path.open("rb") as source:
+        cursor.copy_expert(f"COPY public.{name}_load FROM STDIN WITH (FORMAT csv)", source)
+
+
 def main() -> None:
     missing = [name for name in TABLES if not (OUTPUT / name).is_dir()]
     if missing:
@@ -68,32 +88,32 @@ def main() -> None:
 
     spark = (
         SparkSession.builder.appName("movie-ratings-postgres-load")
-        .master(os.getenv("SPARK_MASTER", "local[4]"))
+        .master(os.getenv("SPARK_MASTER", "local[*]"))
         .config("spark.driver.memory", os.getenv("SPARK_DRIVER_MEMORY", "4g"))
         .config("spark.sql.shuffle.partitions", os.getenv("SPARK_SHUFFLE_PARTITIONS", "16"))
         .config("spark.sql.session.timeZone", "UTC")
         .getOrCreate()
     )
     spark.sparkContext.setLogLevel("WARN")
+    schemas = {}
     try:
         for name in TABLES:
-            print(f"Loading {name} into PostgreSQL staging table", flush=True)
+            print(f"Writing {name} as CSV for PostgreSQL COPY", flush=True)
             frame = table_frame(spark, name)
-            (
-                frame.write.format("jdbc")
-                .option("url", JDBC_URL)
-                .option("dbtable", f"public.{name}_load")
-                .option("driver", "org.postgresql.Driver")
-                .option("user", os.getenv("POSTGRES_USER", "movie"))
-                .option("password", os.getenv("POSTGRES_PASSWORD", "movie"))
-                .option("batchsize", "10000")
-                .option("numPartitions", "4")
-                .option("reWriteBatchedInserts", "true")
-                .mode("overwrite")
-                .save()
-            )
+            # PostgreSQL CSV escapes quotes by doubling them; empty unquoted fields load as NULL.
+            frame.write.mode("overwrite").option("escape", '"').csv(str(COPY_STAGE / name))
+            schemas[name] = frame.schema
     finally:
         spark.stop()
+
+    with closing(db_connection()) as connection, connection, connection.cursor() as cursor:
+        for name, schema in schemas.items():
+            create_staging_table(cursor, name, schema)
+    parts = [(name, path) for name in TABLES for path in sorted((COPY_STAGE / name).glob("part-*.csv"))]
+    print(f"Copying {len(parts)} CSV parts into PostgreSQL staging tables", flush=True)
+    with ThreadPoolExecutor(max_workers=COPY_WORKERS) as pool:
+        list(pool.map(lambda part: copy_part(*part), parts))
+    shutil.rmtree(COPY_STAGE)
 
     # The published tables remain intact if a staging load fails. Rename them
     # together only after all four staging tables have been written.

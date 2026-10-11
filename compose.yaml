@@ -15,7 +15,7 @@ services:
       AIRFLOW_UI_USERNAME: airflow
       AIRFLOW_UI_PASSWORD: airflow
       PYTHONPATH: /workspace/src
-      SPARK_MASTER: ${SPARK_MASTER:-local[2]}
+      SPARK_MASTER: ${SPARK_MASTER:-local[*]}
       SPARK_DRIVER_MEMORY: ${SPARK_DRIVER_MEMORY:-4g}
       SPARK_SHUFFLE_PARTITIONS: ${SPARK_SHUFFLE_PARTITIONS:-16}
       POSTGRES_HOST: postgres

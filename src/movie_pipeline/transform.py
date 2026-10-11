@@ -130,6 +130,15 @@ def main() -> None:
             .withColumn("rating_year", F.year("rated_at"))
             .select("userId", "movieId", "rating", "timestamp", "rated_at", "rating_year")
         )
+
+        # Write the two base tables first and build every summary from their Parquet copies, so
+        # ratings.csv and the single-threaded IMDb gzip files are each parsed only once.
+        OUTPUT.mkdir(parents=True, exist_ok=True)
+        dim_movies.write.mode("overwrite").parquet(str(OUTPUT / "dim_movies"))
+        dim_movies = spark.read.parquet(str(OUTPUT / "dim_movies"))
+        fact_ratings.write.mode("overwrite").partitionBy("rating_year").parquet(str(OUTPUT / "fact_ratings"))
+        fact_ratings = spark.read.parquet(str(OUTPUT / "fact_ratings"))
+
         movie_aggregates = fact_ratings.groupBy("movieId").agg(
             F.count("*").alias("movielens_rating_count"),
             F.avg("rating").alias("movielens_average_rating"),
@@ -144,9 +153,6 @@ def main() -> None:
             .agg(F.count("*").alias("rating_count"), F.avg("rating").alias("average_rating"))
         )
 
-        OUTPUT.mkdir(parents=True, exist_ok=True)
-        fact_ratings.write.mode("overwrite").partitionBy("rating_year").parquet(str(OUTPUT / "fact_ratings"))
-        dim_movies.write.mode("overwrite").parquet(str(OUTPUT / "dim_movies"))
         movie_metrics.write.mode("overwrite").parquet(str(OUTPUT / "movie_metrics"))
         genre_metrics.write.mode("overwrite").parquet(str(OUTPUT / "genre_metrics"))
 
@@ -154,7 +160,7 @@ def main() -> None:
             "created_at_utc": datetime.now(timezone.utc).isoformat(),
             "source": "MovieLens 32M + IMDb non-commercial datasets",
             "raw_rating_rows": ratings.count(),
-            "valid_rating_rows": valid_ratings.count(),
+            "valid_rating_rows": fact_ratings.count(),
             "movie_rows": dim_movies.count(),
             "movies_with_imdb_rating": dim_movies.filter(F.col("imdb_average_rating").isNotNull()).count(),
         }
