@@ -1,0 +1,50 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "oscars_v1",
+  "position": {
+    "x": 20,
+    "y": 8,
+    "z": 0,
+    "width": 1240,
+    "height": 64,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "รางวัล Oscar กับคะแนน",
+                    "textStyle": {
+                      "fontSize": "18pt",
+                      "fontWeight": "bold",
+                      "color": "#111827"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "ข้อมูลจากไฟล์ Oscars-Data  ·  หนึ่งแถว = หนึ่งเรื่องต่อปีพิธี  ·  จับคู่กับ MovieLens ได้เฉพาะพิธีปี 1980 ขึ้นไป แถวที่จับคู่ไม่ได้จึงไม่มีคะแนน",
+                    "textStyle": {
+                      "fontSize": "10pt",
+                      "fontWeight": "normal",
+                      "color": "#6B7280"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

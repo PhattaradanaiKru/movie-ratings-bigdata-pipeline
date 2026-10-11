@@ -1,0 +1,76 @@
+table powerbi_wikidata_countries
+	lineageTag: b7b03ab7-09d5-448a-a623-84a6f65753e1
+
+	measure หนังตามประเทศ = DISTINCTCOUNT(powerbi_wikidata_countries[movie_id])
+		formatString: #,0
+		lineageTag: c2d8b18c-4f2e-4fc0-b126-14a660151f52
+
+	measure 'MovieLens เฉลี่ยตามประเทศ' = DIVIDE(SUMX(powerbi_wikidata_countries, powerbi_wikidata_countries[movielens_rating_count] * powerbi_wikidata_countries[movielens_average_rating]), SUM(powerbi_wikidata_countries[movielens_rating_count]))
+		formatString: 0.00
+		lineageTag: 83c36911-85d3-48d2-a73f-c397142a7c54
+
+	measure หนังร่วมทุน = CALCULATE(DISTINCTCOUNT(powerbi_wikidata_countries[movie_id]), powerbi_wikidata_countries[movie_country_count] > 1)
+		formatString: #,0
+		lineageTag: 46746af3-1674-47fe-bf57-d5a0faaeef4a
+
+	column movie_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 857614ce-625f-4f6e-b893-1dd9b59c3619
+		summarizeBy: none
+		sourceColumn: movie_id
+
+	column country
+		dataType: string
+		lineageTag: e23958bd-dde9-4670-a32c-7f563d159f55
+		summarizeBy: none
+		sourceColumn: country
+
+	column movie_country_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: f12fd3f9-fd54-444a-8517-dff881627b3b
+		summarizeBy: none
+		sourceColumn: movie_country_count
+
+	column movielens_rating_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: 806a7ee8-18d2-4185-b1d8-7be9a31ff9ad
+		summarizeBy: none
+		sourceColumn: movielens_rating_count
+
+	column movielens_average_rating
+		dataType: double
+		formatString: 0.00
+		lineageTag: 0628abc6-4282-4ae1-9f63-79cbcbe99590
+		summarizeBy: none
+		sourceColumn: movielens_average_rating
+
+	column imdb_vote_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: 5abd5938-01be-41cc-8ca2-256ccc746afb
+		summarizeBy: none
+		sourceColumn: imdb_vote_count
+
+	column imdb_average_rating
+		dataType: double
+		formatString: 0.00
+		lineageTag: e330bdea-a39e-4715-b2f9-c414532f9f93
+		summarizeBy: none
+		sourceColumn: imdb_average_rating
+
+	partition powerbi_wikidata_countries = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database(PgServer, PgDatabase),
+				    View = Source{[Schema="public", Item="powerbi_wikidata_countries"]}[Data],
+				    Selected = Table.SelectColumns(View, {"movie_id", "country", "movie_country_count", "movielens_rating_count", "movielens_average_rating", "imdb_vote_count", "imdb_average_rating"}),
+				    Result = Selected
+				in
+				    Result
+
+	annotation PBI_ResultType = Table
+

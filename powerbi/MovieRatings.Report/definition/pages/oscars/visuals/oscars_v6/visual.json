@@ -1,0 +1,136 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "oscars_v6",
+  "position": {
+    "x": 20,
+    "y": 452,
+    "z": 5000,
+    "height": 248,
+    "width": 610,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "scatterChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_oscars_movies"
+                    }
+                  },
+                  "Property": "film_title"
+                }
+              },
+              "queryRef": "powerbi_oscars_movies.film_title",
+              "nativeQueryRef": "film_title",
+              "active": true,
+              "displayName": "ชื่อหนัง"
+            }
+          ]
+        },
+        "Tooltips": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_oscars_movies"
+                    }
+                  },
+                  "Property": "ชนะ Oscar"
+                }
+              },
+              "queryRef": "powerbi_oscars_movies.ชนะ Oscar",
+              "nativeQueryRef": "ชนะ Oscar"
+            }
+          ]
+        },
+        "X": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_oscars_movies"
+                    }
+                  },
+                  "Property": "เข้าชิง Oscar"
+                }
+              },
+              "queryRef": "powerbi_oscars_movies.เข้าชิง Oscar",
+              "nativeQueryRef": "เข้าชิง Oscar",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_oscars_movies"
+                    }
+                  },
+                  "Property": "IMDb เฉลี่ย (Oscar)"
+                }
+              },
+              "queryRef": "powerbi_oscars_movies.IMDb เฉลี่ย (Oscar)",
+              "nativeQueryRef": "IMDb เฉลี่ย (Oscar)"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "dataPoint": [
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#D97706'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'จำนวนการเข้าชิงเทียบคะแนน IMDb'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

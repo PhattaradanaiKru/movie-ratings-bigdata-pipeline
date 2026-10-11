@@ -1,0 +1,50 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "country_v1",
+  "position": {
+    "x": 20,
+    "y": 8,
+    "z": 0,
+    "width": 1240,
+    "height": 64,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "ประเทศต้นทางของหนัง",
+                    "textStyle": {
+                      "fontSize": "18pt",
+                      "fontWeight": "bold",
+                      "color": "#111827"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "ข้อมูลจาก Wikidata จับคู่ด้วย IMDb ID  ·  หนังร่วมทุนนับในทุกประเทศที่ร่วมสร้าง ผลรวมทุกประเทศจึงมากกว่าจำนวนหนัง  ·  ชื่อประเทศตาม Wikidata รวมรัฐในอดีต เช่น Soviet Union, West Germany",
+                    "textStyle": {
+                      "fontSize": "10pt",
+                      "fontWeight": "normal",
+                      "color": "#6B7280"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

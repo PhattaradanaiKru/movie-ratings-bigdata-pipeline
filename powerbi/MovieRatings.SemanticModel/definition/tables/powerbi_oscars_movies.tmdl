@@ -1,0 +1,126 @@
+table powerbi_oscars_movies
+	lineageTag: 978046da-1d10-48ac-997a-a63c597cdeb4
+
+	measure 'ชนะ Oscar' = SUM(powerbi_oscars_movies[win_count])
+		formatString: #,0
+		lineageTag: ff064554-9cbd-489c-9891-7bb12d29aea9
+
+	measure 'เข้าชิง Oscar' = SUM(powerbi_oscars_movies[nomination_count])
+		formatString: #,0
+		lineageTag: 3c7f1e98-c5ed-44f1-b2e7-60fdec5ab06e
+
+	measure 'IMDb เฉลี่ย (Oscar)' = AVERAGE(powerbi_oscars_movies[imdb_average_rating])
+		formatString: 0.00
+		lineageTag: 2ac2ac11-22c0-453d-bb3d-7f00133ee9e0
+
+	measure 'Oscar snapshot' = MAX(powerbi_oscars_movies[snapshot_at_utc])
+		formatString: yyyy-mm-dd
+		lineageTag: a606467c-2983-4c9e-a5ba-a4f090a838ab
+
+	measure 'IMDb: ชนะ Oscar' = CALCULATE(AVERAGE(powerbi_oscars_movies[imdb_average_rating]), powerbi_oscars_movies[win_count] > 0, powerbi_oscars_movies[imdb_vote_count] >= 1000)
+		formatString: 0.00
+		lineageTag: 07e7bf19-c0bb-425d-bc2d-500a5ac252ae
+
+	measure 'IMDb: เข้าชิงแต่ไม่ชนะ' = CALCULATE(AVERAGE(powerbi_oscars_movies[imdb_average_rating]), powerbi_oscars_movies[win_count] = 0, powerbi_oscars_movies[imdb_vote_count] >= 1000)
+		formatString: 0.00
+		lineageTag: 2c521c0b-9583-4ff0-833a-4630a920e05c
+
+	measure 'IMDb: ไม่เคยเข้าชิง' = VAR nominated = DISTINCT(powerbi_oscars_movies[movie_id]) RETURN AVERAGEX(FILTER(powerbi_movies, powerbi_movies[imdb_vote_count] >= 1000 && powerbi_movies[release_year] >= 1979 && powerbi_movies[release_year] <= 2023 && NOT (powerbi_movies[movie_id] IN nominated)), powerbi_movies[imdb_average_rating])
+		formatString: 0.00
+		lineageTag: 5b83a93a-3718-41d2-9e37-5711f800ddc8
+
+	column ceremony_year
+		dataType: int64
+		formatString: 0
+		lineageTag: 8364c061-b80b-4310-a079-4760c6efe733
+		summarizeBy: none
+		sourceColumn: ceremony_year
+
+	column film_title
+		dataType: string
+		lineageTag: a51155ca-bf36-4a2f-86f6-144c6588c178
+		summarizeBy: none
+		sourceColumn: film_title
+
+	column nomination_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: ea8b0af3-41e9-4961-92cb-961368231e33
+		summarizeBy: none
+		sourceColumn: nomination_count
+
+	column win_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: c6b7308b-11a5-415e-b498-f8e0389c106b
+		summarizeBy: none
+		sourceColumn: win_count
+
+	column movie_id
+		dataType: int64
+		formatString: 0
+		lineageTag: a9c3cad7-0179-4d52-b6ca-b43a688e2b4c
+		summarizeBy: none
+		sourceColumn: movie_id
+
+	column movielens_title
+		dataType: string
+		lineageTag: b5ebb8de-c649-4f44-b6dc-546a4b6d8c60
+		summarizeBy: none
+		sourceColumn: movielens_title
+
+	column release_year
+		dataType: int64
+		formatString: 0
+		lineageTag: 5249bdb1-125a-4409-9cd0-854f2539a890
+		summarizeBy: none
+		sourceColumn: release_year
+
+	column movielens_rating_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: 6f8447aa-e605-4e41-be81-6eeabd040b21
+		summarizeBy: none
+		sourceColumn: movielens_rating_count
+
+	column movielens_average_rating
+		dataType: double
+		formatString: 0.00
+		lineageTag: aa95fcb9-d343-43ab-be54-173c0e0aff71
+		summarizeBy: none
+		sourceColumn: movielens_average_rating
+
+	column imdb_vote_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: 8b1da9d8-f595-4cd3-bd3e-d7e343a5eda8
+		summarizeBy: none
+		sourceColumn: imdb_vote_count
+
+	column imdb_average_rating
+		dataType: double
+		formatString: 0.00
+		lineageTag: 761c2cd9-47c6-41c2-9f5c-e7ab1a712982
+		summarizeBy: none
+		sourceColumn: imdb_average_rating
+
+	column snapshot_at_utc
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn
+		lineageTag: 9245ffc3-7776-4c61-bb15-b56fba4b54b5
+		summarizeBy: none
+		sourceColumn: snapshot_at_utc
+
+	partition powerbi_oscars_movies = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database(PgServer, PgDatabase),
+				    View = Source{[Schema="public", Item="powerbi_oscars_movies"]}[Data],
+				    Selected = Table.SelectColumns(View, {"ceremony_year", "film_title", "nomination_count", "win_count", "movie_id", "movielens_title", "release_year", "movielens_rating_count", "movielens_average_rating", "imdb_vote_count", "imdb_average_rating", "snapshot_at_utc"}),
+				    Result = Table.TransformColumns(Selected, {{"snapshot_at_utc", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(DateTimeZone.From(_))), type datetime}})
+				in
+				    Result
+
+	annotation PBI_ResultType = Table
+

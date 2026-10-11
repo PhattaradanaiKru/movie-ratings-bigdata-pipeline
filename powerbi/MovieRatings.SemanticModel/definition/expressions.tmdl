@@ -1,0 +1,10 @@
+expression PgServer = "localhost:5432" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 8e080561-4873-49e6-835c-8f155a839423
+
+	annotation PBI_ResultType = Text
+
+expression PgDatabase = "movie_ratings" meta [IsParameterQuery=true, Type="Text", IsParameterQueryRequired=true]
+	lineageTag: 5ee82a1d-7292-4c24-8ea8-967a85217a13
+
+	annotation PBI_ResultType = Text
+

@@ -1,0 +1,126 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 0,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 0,
+            "y": 0
+          },
+          "nodeIndex": "powerbi_box_office",
+          "nodeLineageTag": "6815d8cb-f826-4df0-9690-2310723b87fc",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 284,
+            "y": 38
+          },
+          "nodeIndex": "powerbi_genres",
+          "nodeLineageTag": "f9524f69-b3a2-42de-aaf3-f8f6ff6dcf40",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 568,
+            "y": 0
+          },
+          "nodeIndex": "powerbi_movies",
+          "nodeLineageTag": "f177d376-87f2-413e-92c0-e46d30309b73",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 852,
+            "y": 0
+          },
+          "nodeIndex": "powerbi_oscars_movies",
+          "nodeLineageTag": "489c3bca-43b5-463d-b5cb-7094cdf8d2be",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1136,
+            "y": 2
+          },
+          "nodeIndex": "powerbi_overview",
+          "nodeLineageTag": "cc392c1e-f7d1-4117-9823-a592e1f2b2a2",
+          "size": {
+            "height": 296,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1420,
+            "y": 0
+          },
+          "nodeIndex": "powerbi_release_year",
+          "nodeLineageTag": "40d80885-dc51-49a1-9606-e02860f47ed1",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1704,
+            "y": 0
+          },
+          "nodeIndex": "powerbi_wikidata_countries",
+          "nodeLineageTag": "eb7c4116-7823-4d1e-8b87-72c6c2c6ae8c",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1988,
+            "y": 0
+          },
+          "nodeIndex": "powerbi_wikidata_movies",
+          "nodeLineageTag": "8fb1ef97-47a7-4aa8-9dc5-64480410ed43",
+          "size": {
+            "height": 300,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 100,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

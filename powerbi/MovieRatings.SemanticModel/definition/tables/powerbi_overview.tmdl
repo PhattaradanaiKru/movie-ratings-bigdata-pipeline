@@ -1,0 +1,67 @@
+table powerbi_overview
+	lineageTag: bfc4daa5-c3e7-4267-a2ff-12c55432cbf0
+
+	measure หนังทั้งหมด = SUM(powerbi_overview[movie_count])
+		formatString: #,0
+		lineageTag: 9ce0b1ce-35d9-4487-b39d-3964ca08e1d1
+
+	measure 'หนังที่มีรีวิว MovieLens' = SUM(powerbi_overview[rated_movie_count])
+		formatString: #,0
+		lineageTag: 1cda930b-9e7f-4dbe-95e5-72ffe79eff9e
+
+	measure 'คะแนน MovieLens ทั้งหมด' = SUM(powerbi_overview[movielens_rating_count])
+		formatString: #,0
+		lineageTag: 96bd927e-cf4a-4cd9-b185-92372507a988
+
+	measure 'IMDb votes ทั้งหมด' = SUM(powerbi_overview[imdb_vote_count])
+		formatString: #,0
+		lineageTag: 9bd6909c-317b-4694-8af3-cfc55eb1a66a
+
+	column movie_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: 3f600603-efa2-4c98-b3ae-53f6b3c42e33
+		summarizeBy: none
+		sourceColumn: movie_count
+
+	column rated_movie_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: d106e4c2-6df6-4eb3-9653-66607fd13426
+		summarizeBy: none
+		sourceColumn: rated_movie_count
+
+	column movielens_rating_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: d2179d5e-28f4-4d25-91bf-9b0933fba322
+		summarizeBy: none
+		sourceColumn: movielens_rating_count
+
+	column imdb_movie_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: acf9273d-4f9a-459f-85c1-25a1883cde35
+		summarizeBy: none
+		sourceColumn: imdb_movie_count
+
+	column imdb_vote_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: 8d3acb89-6fa5-415b-aa70-8bc18be06ff5
+		summarizeBy: none
+		sourceColumn: imdb_vote_count
+
+	partition powerbi_overview = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database(PgServer, PgDatabase),
+				    View = Source{[Schema="public", Item="powerbi_overview"]}[Data],
+				    Selected = Table.SelectColumns(View, {"movie_count", "rated_movie_count", "movielens_rating_count", "imdb_movie_count", "imdb_vote_count"}),
+				    Result = Selected
+				in
+				    Result
+
+	annotation PBI_ResultType = Table
+

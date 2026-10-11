@@ -1,0 +1,51 @@
+table powerbi_genres
+	lineageTag: 7ba1d191-4499-4017-9d43-2561bd84834b
+
+	measure จำนวนคะแนนตามแนว = SUM(powerbi_genres[rating_count])
+		formatString: #,0
+		lineageTag: 2a7beef6-5da2-4b48-9d5a-d71b4ed3726a
+
+	measure 'MovieLens เฉลี่ยตามแนว' = DIVIDE(SUMX(powerbi_genres, powerbi_genres[rating_count] * powerbi_genres[movielens_average_rating]), SUM(powerbi_genres[rating_count]))
+		formatString: 0.00
+		lineageTag: ec0fc79b-b69e-4931-a7b2-ba894c0c51ab
+
+	column genre
+		dataType: string
+		lineageTag: e8c1dbc4-9501-4f46-8243-af1f79bbeff0
+		summarizeBy: none
+		sourceColumn: genre
+
+	column release_year
+		dataType: int64
+		formatString: 0
+		lineageTag: 91f6e5de-5828-4990-944f-09ec1498b5d9
+		summarizeBy: none
+		sourceColumn: release_year
+
+	column rating_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: cfcb29f4-eb65-409b-bab4-fc590035c38d
+		summarizeBy: none
+		sourceColumn: rating_count
+
+	column movielens_average_rating
+		dataType: double
+		formatString: 0.00
+		lineageTag: 2840f92c-973f-4ebf-987f-fd7cbb627bf2
+		summarizeBy: none
+		sourceColumn: movielens_average_rating
+
+	partition powerbi_genres = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database(PgServer, PgDatabase),
+				    View = Source{[Schema="public", Item="powerbi_genres"]}[Data],
+				    Selected = Table.SelectColumns(View, {"genre", "release_year", "rating_count", "movielens_average_rating"}),
+				    Result = Selected
+				in
+				    Result
+
+	annotation PBI_ResultType = Table
+

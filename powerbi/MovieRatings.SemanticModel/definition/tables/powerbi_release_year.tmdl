@@ -1,0 +1,77 @@
+table powerbi_release_year
+	lineageTag: 5bce60b7-a2b2-4a42-91a1-45b44847d0d7
+
+	measure 'จำนวนคะแนน MovieLens' = SUM(powerbi_release_year[movielens_rating_count])
+		formatString: #,0
+		lineageTag: da19ef34-8b66-44df-8b55-1a647e0dcee5
+
+	measure 'MovieLens เฉลี่ย x2 (สเกล 10)' = IF(SUM(powerbi_release_year[movielens_rating_count]) >= 1000, 2 * DIVIDE(SUMX(powerbi_release_year, powerbi_release_year[movielens_rating_count] * powerbi_release_year[movielens_average_rating]), SUM(powerbi_release_year[movielens_rating_count])))
+		formatString: 0.00
+		lineageTag: 9d840b01-585e-4ab4-9d65-d9bb2d2a51ac
+
+	measure 'IMDb เฉลี่ย (สเกล 10)' = IF(SUM(powerbi_release_year[imdb_vote_count]) >= 1000, DIVIDE(SUMX(powerbi_release_year, powerbi_release_year[imdb_vote_count] * powerbi_release_year[imdb_weighted_average_rating]), SUM(powerbi_release_year[imdb_vote_count])))
+		formatString: 0.00
+		lineageTag: eec054a6-0aed-42cf-8a33-fc3a3427d1c5
+
+	column release_year
+		dataType: int64
+		formatString: 0
+		lineageTag: 4851f2e8-0249-4fad-86b1-36fe58a77400
+		summarizeBy: none
+		sourceColumn: release_year
+
+	column rated_movie_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: b679ddb3-e56d-4399-8567-de6c6af2a70a
+		summarizeBy: none
+		sourceColumn: rated_movie_count
+
+	column movielens_rating_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: 33e9a9a8-5256-4bf8-b171-3be8c103794e
+		summarizeBy: none
+		sourceColumn: movielens_rating_count
+
+	column movielens_average_rating
+		dataType: double
+		formatString: 0.00
+		lineageTag: e427bf0d-efbf-48a0-8164-955c387f7ee3
+		summarizeBy: none
+		sourceColumn: movielens_average_rating
+
+	column imdb_movie_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: b6d43719-5df5-411f-99c3-e9bba29a05c8
+		summarizeBy: none
+		sourceColumn: imdb_movie_count
+
+	column imdb_vote_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: ef51e0f8-afb9-412a-95d9-ced9ec8819ff
+		summarizeBy: none
+		sourceColumn: imdb_vote_count
+
+	column imdb_weighted_average_rating
+		dataType: double
+		formatString: 0.00
+		lineageTag: e9eb440c-5eca-434b-a06e-3a47676effb1
+		summarizeBy: none
+		sourceColumn: imdb_weighted_average_rating
+
+	partition powerbi_release_year = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database(PgServer, PgDatabase),
+				    View = Source{[Schema="public", Item="powerbi_release_year"]}[Data],
+				    Selected = Table.SelectColumns(View, {"release_year", "rated_movie_count", "movielens_rating_count", "movielens_average_rating", "imdb_movie_count", "imdb_vote_count", "imdb_weighted_average_rating"}),
+				    Result = Selected
+				in
+				    Result
+
+	annotation PBI_ResultType = Table
+

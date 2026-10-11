@@ -1,0 +1,173 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "box_office_v6",
+  "position": {
+    "x": 650,
+    "y": 80,
+    "z": 5000,
+    "height": 620,
+    "width": 610,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_box_office"
+                    }
+                  },
+                  "Property": "rank"
+                }
+              },
+              "queryRef": "powerbi_box_office.rank",
+              "nativeQueryRef": "rank",
+              "displayName": "อันดับ"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_box_office"
+                    }
+                  },
+                  "Property": "web_title"
+                }
+              },
+              "queryRef": "powerbi_box_office.web_title",
+              "nativeQueryRef": "web_title",
+              "displayName": "ชื่อหนัง (Wikipedia)"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_box_office"
+                    }
+                  },
+                  "Property": "release_year"
+                }
+              },
+              "queryRef": "powerbi_box_office.release_year",
+              "nativeQueryRef": "release_year",
+              "displayName": "ปี"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_box_office"
+                    }
+                  },
+                  "Property": "worldwide_gross_usd"
+                }
+              },
+              "queryRef": "powerbi_box_office.worldwide_gross_usd",
+              "nativeQueryRef": "worldwide_gross_usd",
+              "displayName": "รายได้ทั่วโลก (USD)"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_box_office"
+                    }
+                  },
+                  "Property": "movielens_average_rating"
+                }
+              },
+              "queryRef": "powerbi_box_office.movielens_average_rating",
+              "nativeQueryRef": "movielens_average_rating",
+              "displayName": "MovieLens"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_box_office"
+                    }
+                  },
+                  "Property": "imdb_average_rating"
+                }
+              },
+              "queryRef": "powerbi_box_office.imdb_average_rating",
+              "nativeQueryRef": "imdb_average_rating",
+              "displayName": "IMDb"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "powerbi_box_office"
+                  }
+                },
+                "Property": "rank"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ]
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'หนังรายได้สูงสุด'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'ช่องคะแนนว่าง = จับคู่กับ MovieLens ไม่ได้'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "movies_v5",
+  "position": {
+    "x": 520,
+    "y": 80,
+    "z": 4000,
+    "height": 620,
+    "width": 740,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_movies"
+                    }
+                  },
+                  "Property": "title"
+                }
+              },
+              "queryRef": "powerbi_movies.title",
+              "nativeQueryRef": "title",
+              "displayName": "ชื่อหนัง"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_movies"
+                    }
+                  },
+                  "Property": "release_year"
+                }
+              },
+              "queryRef": "powerbi_movies.release_year",
+              "nativeQueryRef": "release_year",
+              "displayName": "ปีที่ฉาย"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_movies"
+                    }
+                  },
+                  "Property": "movielens_average_rating"
+                }
+              },
+              "queryRef": "powerbi_movies.movielens_average_rating",
+              "nativeQueryRef": "movielens_average_rating",
+              "displayName": "MovieLens (0.5–5)"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_movies"
+                    }
+                  },
+                  "Property": "movielens_rating_count"
+                }
+              },
+              "queryRef": "powerbi_movies.movielens_rating_count",
+              "nativeQueryRef": "movielens_rating_count",
+              "displayName": "รีวิว MovieLens"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_movies"
+                    }
+                  },
+                  "Property": "imdb_average_rating"
+                }
+              },
+              "queryRef": "powerbi_movies.imdb_average_rating",
+              "nativeQueryRef": "imdb_average_rating",
+              "displayName": "IMDb (1–10)"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_movies"
+                    }
+                  },
+                  "Property": "imdb_vote_count"
+                }
+              },
+              "queryRef": "powerbi_movies.imdb_vote_count",
+              "nativeQueryRef": "imdb_vote_count",
+              "displayName": "IMDb votes"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "powerbi_movies"
+                  }
+                },
+                "Property": "movielens_average_rating"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'หนังเรียงตามคะแนน MovieLens'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'คลิกหัวคอลัมน์เพื่อเปลี่ยนการเรียง'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

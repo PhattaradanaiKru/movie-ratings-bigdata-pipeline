@@ -1,0 +1,170 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "movies_v4",
+  "position": {
+    "x": 20,
+    "y": 192,
+    "z": 3000,
+    "height": 508,
+    "width": 480,
+    "tabOrder": 3000
+  },
+  "visual": {
+    "visualType": "scatterChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_movies"
+                    }
+                  },
+                  "Property": "title"
+                }
+              },
+              "queryRef": "powerbi_movies.title",
+              "nativeQueryRef": "title",
+              "active": true,
+              "displayName": "ชื่อหนัง"
+            }
+          ]
+        },
+        "Tooltips": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_movies"
+                    }
+                  },
+                  "Property": "รีวิว MovieLens"
+                }
+              },
+              "queryRef": "powerbi_movies.รีวิว MovieLens",
+              "nativeQueryRef": "รีวิว MovieLens"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_movies"
+                    }
+                  },
+                  "Property": "IMDb votes"
+                }
+              },
+              "queryRef": "powerbi_movies.IMDb votes",
+              "nativeQueryRef": "IMDb votes"
+            }
+          ]
+        },
+        "X": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_movies"
+                    }
+                  },
+                  "Property": "MovieLens (0.5-5)"
+                }
+              },
+              "queryRef": "powerbi_movies.MovieLens (0.5-5)",
+              "nativeQueryRef": "MovieLens (0.5-5)",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_movies"
+                    }
+                  },
+                  "Property": "IMDb (1-10)"
+                }
+              },
+              "queryRef": "powerbi_movies.IMDb (1-10)",
+              "nativeQueryRef": "IMDb (1-10)"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "dataPoint": [
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#2563EB'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'MovieLens เทียบ IMDb รายเรื่อง'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'หนึ่งจุด = หนึ่งเรื่อง  ·  ชี้ที่จุดเพื่อดูชื่อและจำนวนรีวิว'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

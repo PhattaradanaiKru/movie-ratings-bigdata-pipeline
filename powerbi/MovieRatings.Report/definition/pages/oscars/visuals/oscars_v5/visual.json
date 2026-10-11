@@ -1,0 +1,199 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "oscars_v5",
+  "position": {
+    "x": 20,
+    "y": 192,
+    "z": 4000,
+    "width": 610,
+    "height": 250,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_oscars_movies"
+                    }
+                  },
+                  "Property": "IMDb: ชนะ Oscar"
+                }
+              },
+              "queryRef": "powerbi_oscars_movies.IMDb: ชนะ Oscar",
+              "nativeQueryRef": "IMDb: ชนะ Oscar"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_oscars_movies"
+                    }
+                  },
+                  "Property": "IMDb: เข้าชิงแต่ไม่ชนะ"
+                }
+              },
+              "queryRef": "powerbi_oscars_movies.IMDb: เข้าชิงแต่ไม่ชนะ",
+              "nativeQueryRef": "IMDb: เข้าชิงแต่ไม่ชนะ"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_oscars_movies"
+                    }
+                  },
+                  "Property": "IMDb: ไม่เคยเข้าชิง"
+                }
+              },
+              "queryRef": "powerbi_oscars_movies.IMDb: ไม่เคยเข้าชิง",
+              "nativeQueryRef": "IMDb: ไม่เคยเข้าชิง"
+            }
+          ]
+        }
+      }
+    },
+    "drillFilterOtherVisuals": true,
+    "objects": {
+      "dataPoint": [
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#B45309'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "powerbi_oscars_movies.IMDb: ชนะ Oscar"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#F59E0B'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "powerbi_oscars_movies.IMDb: เข้าชิงแต่ไม่ชนะ"
+          }
+        },
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#9CA3AF'"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "powerbi_oscars_movies.IMDb: ไม่เคยเข้าชิง"
+          }
+        }
+      ],
+      "labels": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "legend": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "position": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Top'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'คะแนน IMDb เฉลี่ยตามสถานะ Oscar (1–10)'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'หนังที่ฉายปี 1979–2023 และมี IMDb votes ≥ 1,000  ·  ทุกเรื่องน้ำหนักเท่ากัน'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

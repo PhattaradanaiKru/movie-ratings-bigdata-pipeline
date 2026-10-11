@@ -1,0 +1,156 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "box_office_v5",
+  "position": {
+    "x": 20,
+    "y": 192,
+    "z": 4000,
+    "height": 508,
+    "width": 610,
+    "tabOrder": 4000
+  },
+  "visual": {
+    "visualType": "scatterChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_box_office"
+                    }
+                  },
+                  "Property": "web_title"
+                }
+              },
+              "queryRef": "powerbi_box_office.web_title",
+              "nativeQueryRef": "web_title",
+              "active": true,
+              "displayName": "ชื่อหนัง"
+            }
+          ]
+        },
+        "Tooltips": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_box_office"
+                    }
+                  },
+                  "Property": "IMDb เฉลี่ย (รายได้)"
+                }
+              },
+              "queryRef": "powerbi_box_office.IMDb เฉลี่ย (รายได้)",
+              "nativeQueryRef": "IMDb เฉลี่ย (รายได้)"
+            }
+          ]
+        },
+        "X": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_box_office"
+                    }
+                  },
+                  "Property": "รายได้ทั่วโลก (USD)"
+                }
+              },
+              "queryRef": "powerbi_box_office.รายได้ทั่วโลก (USD)",
+              "nativeQueryRef": "รายได้ทั่วโลก (USD)",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_box_office"
+                    }
+                  },
+                  "Property": "MovieLens เฉลี่ย (รายได้)"
+                }
+              },
+              "queryRef": "powerbi_box_office.MovieLens เฉลี่ย (รายได้)",
+              "nativeQueryRef": "MovieLens เฉลี่ย (รายได้)"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "dataPoint": [
+        {
+          "properties": {
+            "fill": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "Literal": {
+                      "Value": "'#2563EB'"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'รายได้ทั่วโลกเทียบคะแนน MovieLens'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'แสดงเฉพาะหนังที่จับคู่ได้'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

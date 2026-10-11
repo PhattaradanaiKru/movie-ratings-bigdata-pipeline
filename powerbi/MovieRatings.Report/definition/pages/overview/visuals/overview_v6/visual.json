@@ -1,0 +1,55 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "overview_v6",
+  "position": {
+    "x": 1020,
+    "y": 80,
+    "z": 5000,
+    "height": 100,
+    "width": 240,
+    "tabOrder": 5000
+  },
+  "visual": {
+    "visualType": "slicer",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_release_year"
+                    }
+                  },
+                  "Property": "release_year"
+                }
+              },
+              "queryRef": "powerbi_release_year.release_year",
+              "nativeQueryRef": "release_year",
+              "active": true,
+              "displayName": "ปีที่หนังฉาย"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "data": [
+        {
+          "properties": {
+            "mode": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Between'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

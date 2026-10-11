@@ -1,0 +1,535 @@
+cultureInfo en-US
+
+	linguisticMetadata =
+			{
+			  "Version": "2.0.0",
+			  "Language": "en-US",
+			  "Entities": {
+			    "powerbi_release_year.release_year": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_release_year",
+			          "ConceptualProperty": "release_year"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "ปีที่หนังฉาย": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_movies.release_year": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_movies",
+			          "ConceptualProperty": "release_year"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "ปีที่หนังฉาย": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        },
+			        {
+			          "ปีที่ฉาย": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_movies.title": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_movies",
+			          "ConceptualProperty": "title"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "ชื่อหนัง": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_movies.movielens_average_rating": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_movies",
+			          "ConceptualProperty": "movielens_average_rating"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "MovieLens (0.5–5)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_movies.movielens_rating_count": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_movies",
+			          "ConceptualProperty": "movielens_rating_count"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "รีวิว MovieLens": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_movies.imdb_average_rating": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_movies",
+			          "ConceptualProperty": "imdb_average_rating"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "IMDb (1–10)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_movies.imdb_vote_count": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_movies",
+			          "ConceptualProperty": "imdb_vote_count"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "IMDb votes": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_genres.release_year": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_genres",
+			          "ConceptualProperty": "release_year"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "ปีที่หนังฉาย": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_genres.genre": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_genres",
+			          "ConceptualProperty": "genre"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "แนวหนัง": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_box_office.web_title": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_box_office",
+			          "ConceptualProperty": "web_title"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "ชื่อหนัง": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        },
+			        {
+			          "ชื่อหนัง (Wikipedia)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_box_office.rank": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_box_office",
+			          "ConceptualProperty": "rank"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "อันดับ": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_box_office.release_year": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_box_office",
+			          "ConceptualProperty": "release_year"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "ปี": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_box_office.worldwide_gross_usd": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_box_office",
+			          "ConceptualProperty": "worldwide_gross_usd"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "รายได้ทั่วโลก (USD)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_box_office.movielens_average_rating": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_box_office",
+			          "ConceptualProperty": "movielens_average_rating"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "MovieLens": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_box_office.imdb_average_rating": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_box_office",
+			          "ConceptualProperty": "imdb_average_rating"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "IMDb": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_wikidata_countries.country": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_wikidata_countries",
+			          "ConceptualProperty": "country"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "ประเทศ": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_wikidata_countries.columnั": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_wikidata_countries",
+			          "ConceptualProperty": "หนังตามประเทศ"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "จำนวนหนัง": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_wikidata_countries.movielens_ี่": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_wikidata_countries",
+			          "ConceptualProperty": "MovieLens เฉลี่ยตามประเทศ"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "MovieLens เฉลี่ย (0.5–5)": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_oscars_movies.film_title": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_oscars_movies",
+			          "ConceptualProperty": "film_title"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "ชื่อหนัง": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_oscars_movies.ceremony_year": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_oscars_movies",
+			          "ConceptualProperty": "ceremony_year"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "ปีพิธี": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_oscars_movies.win_count": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_oscars_movies",
+			          "ConceptualProperty": "win_count"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "ชนะ": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_oscars_movies.nomination_count": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_oscars_movies",
+			          "ConceptualProperty": "nomination_count"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "เข้าชิง": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_oscars_movies.imdb_average_rating": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_oscars_movies",
+			          "ConceptualProperty": "imdb_average_rating"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "IMDb": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    },
+			    "powerbi_oscars_movies.movielens_average_rating": {
+			      "Definition": {
+			        "Binding": {
+			          "ConceptualEntity": "powerbi_oscars_movies",
+			          "ConceptualProperty": "movielens_average_rating"
+			        }
+			      },
+			      "State": "Generated",
+			      "Terms": [
+			        {
+			          "MovieLens": {
+			            "State": "Suggested",
+			            "Source": {
+			              "Type": "External",
+			              "Agent": "PowerBI.VisualColumnRename"
+			            },
+			            "Weight": 0.9
+			          }
+			        }
+			      ]
+			    }
+			  }
+			}
+		contentType: json
+

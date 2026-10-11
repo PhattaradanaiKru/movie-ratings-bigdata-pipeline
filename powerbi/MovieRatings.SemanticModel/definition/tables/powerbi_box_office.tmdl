@@ -1,0 +1,115 @@
+table powerbi_box_office
+	lineageTag: 7ced7cf8-40cd-4511-a7a9-e63a293155cc
+
+	measure 'รายได้ทั่วโลก (USD)' = SUM(powerbi_box_office[worldwide_gross_usd])
+		formatString: $#,0
+		lineageTag: 0471b68a-b2f5-4eb6-97d1-0b5bf1be28c6
+
+	measure 'MovieLens เฉลี่ย (รายได้)' = AVERAGE(powerbi_box_office[movielens_average_rating])
+		formatString: 0.00
+		lineageTag: 6fab3323-be78-4cb1-96ae-4c59da6d5571
+
+	measure 'IMDb เฉลี่ย (รายได้)' = AVERAGE(powerbi_box_office[imdb_average_rating])
+		formatString: 0.00
+		lineageTag: 6b9433b8-85ad-4193-a117-d1f4cbae3e9c
+
+	measure 'จับคู่ MovieLens ได้' = COUNT(powerbi_box_office[movie_id])
+		formatString: #,0
+		lineageTag: b41160d7-6a4b-4fea-975e-28ba6e261379
+
+	measure 'Wikipedia snapshot' = MAX(powerbi_box_office[snapshot_at_utc])
+		formatString: yyyy-mm-dd
+		lineageTag: 34a4d34e-da01-447c-96fa-1f58ca098aa5
+
+	measure 'หนัง Top 50' = COUNTROWS(powerbi_box_office)
+		formatString: #,0
+		lineageTag: d9e03d00-e86d-4ca0-b946-82ee38e04f89
+
+	column rank
+		dataType: int64
+		formatString: 0
+		lineageTag: c728b8aa-7851-41f9-ad36-a063573ce576
+		summarizeBy: none
+		sourceColumn: rank
+
+	column web_title
+		dataType: string
+		lineageTag: 265ff548-8cb5-464b-a4ce-17977f77da65
+		summarizeBy: none
+		sourceColumn: web_title
+
+	column release_year
+		dataType: int64
+		formatString: 0
+		lineageTag: edc7221c-5f24-4461-bf79-c49722d4fd43
+		summarizeBy: none
+		sourceColumn: release_year
+
+	column worldwide_gross_usd
+		dataType: int64
+		formatString: #,0
+		lineageTag: 57102756-23ca-4245-8aff-9ad9a233d1f4
+		summarizeBy: none
+		sourceColumn: worldwide_gross_usd
+
+	column movie_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 2e198914-5467-4203-acaa-6d5aec1c0a61
+		summarizeBy: none
+		sourceColumn: movie_id
+
+	column movielens_title
+		dataType: string
+		lineageTag: 8bab57ce-d6b2-49fc-9a89-9928aba14255
+		summarizeBy: none
+		sourceColumn: movielens_title
+
+	column movielens_rating_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: a892226e-e35e-4c76-8766-382a88273dd2
+		summarizeBy: none
+		sourceColumn: movielens_rating_count
+
+	column movielens_average_rating
+		dataType: double
+		formatString: 0.00
+		lineageTag: f3240b3b-69f4-462f-94b5-4290cdc2c1d8
+		summarizeBy: none
+		sourceColumn: movielens_average_rating
+
+	column imdb_vote_count
+		dataType: int64
+		formatString: #,0
+		lineageTag: 46e23eb2-9573-474d-9af8-0f474b213a15
+		summarizeBy: none
+		sourceColumn: imdb_vote_count
+
+	column imdb_average_rating
+		dataType: double
+		formatString: 0.00
+		lineageTag: bc4c4ec8-2bd3-4df0-8642-8ca2ffc59dd4
+		summarizeBy: none
+		sourceColumn: imdb_average_rating
+
+	column snapshot_at_utc
+		dataType: dateTime
+		formatString: yyyy-mm-dd hh:nn
+		lineageTag: ef87963f-d407-491f-96cc-4727758ac434
+		summarizeBy: none
+		sourceColumn: snapshot_at_utc
+
+	partition powerbi_box_office = m
+		mode: import
+		source =
+				let
+				    Source = PostgreSQL.Database(PgServer, PgDatabase),
+				    View = Source{[Schema="public", Item="powerbi_box_office"]}[Data],
+				    Selected = Table.SelectColumns(View, {"rank", "web_title", "release_year", "worldwide_gross_usd", "movie_id", "movielens_title", "movielens_rating_count", "movielens_average_rating", "imdb_vote_count", "imdb_average_rating", "snapshot_at_utc"}),
+				    Result = Table.TransformColumns(Selected, {{"snapshot_at_utc", each if _ = null then null else DateTimeZone.RemoveZone(DateTimeZone.ToUtc(DateTimeZone.From(_))), type datetime}})
+				in
+				    Result
+
+	annotation PBI_ResultType = Table
+

@@ -10,10 +10,17 @@
 | `powerbi_genres` | แนวหนังและปีที่ฉายหนึ่งคู่ต่อแถว | คะแนนและจำนวนรีวิวตามแนวหนัง |
 | `powerbi_box_office` | หนังรายได้สูงสุดใน Wikipedia หนึ่งเรื่องต่อแถว | เทียบรายได้กับคะแนนเมื่อ `movie_id` ไม่เป็น NULL |
 | `powerbi_wikidata_movies` | หนัง MovieLens ทุกเรื่อง พร้อมข้อมูล Wikidata เมื่อพบ | วิเคราะห์ประเทศต้นทางกับคะแนนและดูความครอบคลุม |
+| `powerbi_wikidata_countries` | หนังหนึ่งเรื่องต่อประเทศต้นทางหนึ่งประเทศ | นับหนังและคะแนนตามประเทศ หนังร่วมทุนถูกนับในทุกประเทศที่ร่วมสร้าง |
 | `powerbi_oscars_movies` | หนังหนึ่งเรื่องต่อปีพิธี Oscar | เปรียบเทียบจำนวนรางวัลกับคะแนนหนัง |
 | `powerbi_oscars_awards` | รางวัลหนึ่งรายการต่อแถว | กรองหมวดรางวัลและสถานะชนะ/เข้าชิง |
 
-views สี่ชุดแรกสร้างหลังโหลด PostgreSQL และ views ภายนอกอีกสี่ชุดสร้างในขั้น `enrich_external` จึงไม่ต้องรัน SQL ด้วยมือ Power BI Desktop รุ่นปัจจุบันมี PostgreSQL connector และ Npgsql มาให้แล้ว ใช้ **Refresh** หลัง DAG รอบใหม่สำเร็จเพื่อดึง snapshot ล่าสุด หากเชื่อมจากคนละเครื่อง `localhost` จะหมายถึงเครื่องที่รัน Power BI ต้องตั้งค่าการเข้าถึง PostgreSQL ของเครื่องที่รัน Docker ก่อน
+## เปิด dashboard สำเร็จรูป
+
+โฟลเดอร์ `powerbi/` มี Power BI Project ที่เชื่อม views ข้างต้น สร้าง DAX measures และหน้า dashboard ไว้แล้ว เปิด `powerbi/MovieRatings.pbip` ด้วย Power BI Desktop แล้วกด **Refresh** เมื่อถามสิทธิ์ให้เลือกแท็บ **Database** ใส่ `movie` / `movie` และถ้าถามเรื่อง encryption ให้กด OK เพื่อต่อแบบไม่เข้ารหัส ถ้าใช้พอร์ตอื่น แก้ parameter `PgServer` ใน **Transform data → Manage parameters** ไฟล์ cache ข้อมูล (`.pbi/cache.abf`) ถูก ignore ใน Git
+
+หน้าใน dashboard คือ ภาพรวม, หนังรายเรื่อง (กรองหนังที่มีรีวิว ≥ 1,000 ทั้งสองแหล่ง ปรับได้ในแผง Filters), แนวหนัง, รายได้กับคะแนน, ประเทศต้นทาง และ Oscar ทุกหน้าใช้สีน้ำเงินแทน MovieLens และสีส้มแทน IMDb
+
+views สี่ชุดแรกสร้างในขั้น `load_postgres` และ views ข้อมูลภายนอกสร้างในขั้น `publish_external_to_postgres` จึงไม่ต้องรัน SQL ด้วยมือ Power BI Desktop รุ่นปัจจุบันมี PostgreSQL connector และ Npgsql มาให้แล้ว ใช้ **Refresh** หลัง DAG รอบใหม่สำเร็จเพื่อดึง snapshot ล่าสุด หากเชื่อมจากคนละเครื่อง `localhost` จะหมายถึงเครื่องที่รัน Power BI ต้องตั้งค่าการเข้าถึง PostgreSQL ของเครื่องที่รัน Docker ก่อน
 
 ## หน้า dashboard ที่แนะนำ
 

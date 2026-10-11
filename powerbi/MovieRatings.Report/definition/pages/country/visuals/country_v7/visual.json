@@ -1,0 +1,128 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "country_v7",
+  "position": {
+    "x": 650,
+    "y": 80,
+    "z": 6000,
+    "height": 620,
+    "width": 610,
+    "tabOrder": 6000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_wikidata_countries"
+                    }
+                  },
+                  "Property": "country"
+                }
+              },
+              "queryRef": "powerbi_wikidata_countries.country",
+              "nativeQueryRef": "country",
+              "displayName": "ประเทศ"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_wikidata_countries"
+                    }
+                  },
+                  "Property": "หนังตามประเทศ"
+                }
+              },
+              "queryRef": "powerbi_wikidata_countries.หนังตามประเทศ",
+              "nativeQueryRef": "หนังตามประเทศ",
+              "displayName": "จำนวนหนัง"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_wikidata_countries"
+                    }
+                  },
+                  "Property": "MovieLens เฉลี่ยตามประเทศ"
+                }
+              },
+              "queryRef": "powerbi_wikidata_countries.MovieLens เฉลี่ยตามประเทศ",
+              "nativeQueryRef": "MovieLens เฉลี่ยตามประเทศ",
+              "displayName": "MovieLens เฉลี่ย (0.5–5)"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "powerbi_wikidata_countries"
+                  }
+                },
+                "Property": "หนังตามประเทศ"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'ทุกประเทศ'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'คะแนนเฉลี่ยถ่วงน้ำหนักด้วยจำนวนรีวิว'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "MovieRatings"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "ab76da32-dbbb-4e71-b5e7-71d3c07503d4"
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.13.0/schema.json",
+  "name": "oscars_v7",
+  "position": {
+    "x": 650,
+    "y": 80,
+    "z": 6000,
+    "height": 620,
+    "width": 610,
+    "tabOrder": 6000
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_oscars_movies"
+                    }
+                  },
+                  "Property": "film_title"
+                }
+              },
+              "queryRef": "powerbi_oscars_movies.film_title",
+              "nativeQueryRef": "film_title",
+              "displayName": "ชื่อหนัง"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_oscars_movies"
+                    }
+                  },
+                  "Property": "ceremony_year"
+                }
+              },
+              "queryRef": "powerbi_oscars_movies.ceremony_year",
+              "nativeQueryRef": "ceremony_year",
+              "displayName": "ปีพิธี"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_oscars_movies"
+                    }
+                  },
+                  "Property": "win_count"
+                }
+              },
+              "queryRef": "powerbi_oscars_movies.win_count",
+              "nativeQueryRef": "win_count",
+              "displayName": "ชนะ"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_oscars_movies"
+                    }
+                  },
+                  "Property": "nomination_count"
+                }
+              },
+              "queryRef": "powerbi_oscars_movies.nomination_count",
+              "nativeQueryRef": "nomination_count",
+              "displayName": "เข้าชิง"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_oscars_movies"
+                    }
+                  },
+                  "Property": "imdb_average_rating"
+                }
+              },
+              "queryRef": "powerbi_oscars_movies.imdb_average_rating",
+              "nativeQueryRef": "imdb_average_rating",
+              "displayName": "IMDb"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "powerbi_oscars_movies"
+                    }
+                  },
+                  "Property": "movielens_average_rating"
+                }
+              },
+              "queryRef": "powerbi_oscars_movies.movielens_average_rating",
+              "nativeQueryRef": "movielens_average_rating",
+              "displayName": "MovieLens"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "powerbi_oscars_movies"
+                  }
+                },
+                "Property": "win_count"
+              }
+            },
+            "direction": "Descending"
+          }
+        ]
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'หนังที่เข้าชิงและได้รางวัล'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'เรียงตามจำนวนรางวัลที่ชนะ'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
