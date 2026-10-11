@@ -1,4 +1,4 @@
-.PHONY: download verify extract transform spark-transform airflow-up airflow-trigger airflow-down db-counts clean-processed
+.PHONY: download verify extract transform spark-transform airflow-up airflow-trigger airflow-down db-counts external-refresh clean-processed
 
 PYTHON ?= python3
 
@@ -29,6 +29,9 @@ airflow-down:
 db-counts:
 	docker compose exec -T postgres psql -U movie -d movie_ratings -c \
 		'SELECT (SELECT count(*) FROM fact_ratings) AS ratings, (SELECT count(*) FROM dim_movies) AS movies;'
+
+external-refresh:
+	docker compose exec -T airflow python /workspace/src/movie_pipeline/external_sources.py
 
 clean-processed:
 	rm -rf data/processed

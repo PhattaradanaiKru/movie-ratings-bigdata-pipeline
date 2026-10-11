@@ -23,6 +23,7 @@ services:
       POSTGRES_DB: movie_ratings
       POSTGRES_USER: movie
       POSTGRES_PASSWORD: movie
+      EXTERNAL_SOURCE_USER_AGENT: ${EXTERNAL_SOURCE_USER_AGENT:-MovieRatingsFinalProject/1.0 (https://github.com/PhattaradanaiKru/movie-ratings-bigdata-pipeline)}
     volumes:
       - airflow-home:/opt/airflow
       - ./airflow/start.sh:/workspace/airflow/start.sh:ro

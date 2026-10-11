@@ -6,4 +6,4 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 
 USER airflow
-RUN pip install --no-cache-dir "pyspark==3.5.3" "psycopg2-binary==2.9.10"
+RUN pip install --no-cache-dir "pyspark==3.5.3" "psycopg2-binary==2.9.10" "beautifulsoup4==4.14.2"

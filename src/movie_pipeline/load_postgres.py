@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from pathlib import Path
 
 import psycopg2
 from pyspark.sql import SparkSession, functions as F
@@ -11,6 +12,8 @@ from movie_pipeline.sources import ROOT
 
 OUTPUT = ROOT / "data" / "processed"
 TABLES = ("dim_movies", "movie_metrics", "genre_metrics", "fact_ratings")
+POWERBI_VIEWS = ("powerbi_overview", "powerbi_movies", "powerbi_release_year", "powerbi_genres")
+POWERBI_SQL = Path(__file__).with_name("powerbi_views.sql")
 JDBC_URL = (
     f"jdbc:postgresql://{os.getenv('POSTGRES_HOST', 'postgres')}:"
     f"{os.getenv('POSTGRES_PORT', '5432')}/{os.getenv('POSTGRES_DB', 'movie_ratings')}"
@@ -95,6 +98,14 @@ def main() -> None:
     # together only after all four staging tables have been written.
     with db_connection() as connection:
         with connection.cursor() as cursor:
+            # Views depend on the published tables. Recreate them in the same
+            # transaction as the swap so readers never see a partial refresh.
+            cursor.execute("DROP VIEW IF EXISTS public.powerbi_box_office")
+            cursor.execute("DROP VIEW IF EXISTS public.powerbi_wikidata_movies")
+            cursor.execute("DROP VIEW IF EXISTS public.powerbi_oscars_awards")
+            cursor.execute("DROP VIEW IF EXISTS public.powerbi_oscars_movies")
+            for name in POWERBI_VIEWS:
+                cursor.execute(f"DROP VIEW IF EXISTS public.{name}")
             for name in TABLES:
                 cursor.execute(f"DROP TABLE IF EXISTS public.{name}_previous")
                 cursor.execute("SELECT to_regclass(%s)", (f"public.{name}",))
@@ -105,6 +116,7 @@ def main() -> None:
                 cursor.execute(f"DROP TABLE IF EXISTS public.{name}_previous")
             cursor.execute("CREATE UNIQUE INDEX dim_movies_movie_id_idx ON public.dim_movies (movie_id)")
             cursor.execute("CREATE UNIQUE INDEX movie_metrics_movie_id_idx ON public.movie_metrics (movie_id)")
+            cursor.execute(POWERBI_SQL.read_text(encoding="utf-8"))
 
     with db_connection() as connection:
         connection.autocommit = True

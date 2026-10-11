@@ -12,5 +12,8 @@ Use this skill when changing the project's data pipeline or analytics model.
 - Join MovieLens to IMDb through `links.csv` IDs, not title text. Preserve unmatched movies and report match coverage.
 - Keep individual MovieLens 0.5–5 ratings separate from IMDb aggregate 1–10 ratings. Include vote counts when ranking or comparing titles.
 - Make ingestion and transformations safe to rerun without multiplying records. Keep source snapshot dates in generated metadata.
+- Keep Wikipedia HTML and Wikidata API snapshots under ignored `data/raw/external/`. Report both source URLs, checksums, and match coverage. Join Wikidata by IMDb ID; require exact normalized title and release year for Wikipedia box-office matches, and retain unmatched rows.
+- Wikidata enrichment queries all MovieLens IMDb IDs in small sequential batches. Keep its User-Agent, retry/backoff, cached resume, and matched/unmatched coverage. Treat missing Wikidata items as missing data, not an ingestion failure.
+- The Oscars enrichment uses a pinned third-party CSV originally scraped from Academy pages; do not describe it as a live Oscars.org scraper. Preserve the pinned checksum and report ceremony-year coverage and unmatched films.
 - Run the smallest meaningful verification for a change; for source changes use `make verify`, and for transformation changes check schema, row counts, and sample aggregates.
 - The current implemented stage is Airflow controlling local batch Spark and loading cleaned Parquet into PostgreSQL. Add HDFS, Hive, Trino, and dashboard components incrementally rather than claiming they already run.

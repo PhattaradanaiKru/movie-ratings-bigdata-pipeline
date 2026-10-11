@@ -7,7 +7,7 @@ name = "movie-ratings-pipeline"
 version = "0.1.0"
 description = "MovieLens and IMDb ratings data pipeline"
 requires-python = ">=3.10,<3.13"
-dependencies = ["pyspark>=3.5,<3.6"]
+dependencies = ["pyspark>=3.5,<3.6", "beautifulsoup4>=4.14,<5"]
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -4,11 +4,13 @@
 
 Airflow orchestrates source verification, MovieLens extraction, a local PySpark transform, output quality checks, PostgreSQL loading, and database count checks. Source files stay in `data/raw/`. The transform reads MovieLens CSV and IMDb GZip TSV, writes Parquet tables to `data/processed/`, then loads cleaned tables into PostgreSQL through staging tables.
 
+An enrichment task also scrapes a Wikipedia box-office table, calls the Wikidata SPARQL API for every MovieLens film with an IMDb ID in sequential cached batches, and imports a pinned historical Oscars CSV derived from Academy web pages. It caches raw responses in `data/raw/external/`, publishes separate PostgreSQL tables and Power BI views, and reports match coverage. This enrichment does not change the 32M-row rating fact table.
+
 ## Next infrastructure stage
 
 1. Store raw files and Parquet in HDFS or S3-compatible object storage.
 2. Register Parquet tables in a Hive-compatible catalog if the assignment requires that warehouse path.
-3. Use PostgreSQL SQL queries for a dashboard; add Trino/Presto if the assignment requires it.
+3. Import the PostgreSQL Power BI views and build the report; add Trino/Presto only if the assignment requires it.
 4. Add a catalog refresh task to the existing Airflow DAG after Hive-compatible tables exist.
 5. Record source snapshot dates and checksums; keep each task safe to retry.
 

@@ -40,6 +40,14 @@ def load_database() -> None:
     run_spark_script("load_postgres.py", jdbc=True)
 
 
+def load_external_sources() -> None:
+    subprocess.run(
+        ["python", "/workspace/src/movie_pipeline/external_sources.py"],
+        check=True,
+        env={**os.environ, "PYTHONPATH": "/workspace/src"},
+    )
+
+
 def check_quality() -> None:
     report_path = Path("/workspace/data/processed/quality_report.json")
     report = json.loads(report_path.read_text(encoding="utf-8"))
@@ -70,11 +78,24 @@ def check_database() -> None:
             movie_count = cursor.fetchone()[0]
             cursor.execute("SELECT count(*) FROM public.movie_metrics")
             metric_count = cursor.fetchone()[0]
+            cursor.execute("SELECT count(*) FROM public.powerbi_movies")
+            powerbi_movie_count = cursor.fetchone()[0]
+            cursor.execute("SELECT movielens_rating_count FROM public.powerbi_overview")
+            powerbi_rating_count = cursor.fetchone()[0]
+            cursor.execute("SELECT count(*) FROM public.powerbi_release_year")
+            powerbi_year_count = cursor.fetchone()[0]
+            cursor.execute("SELECT count(*) FROM public.powerbi_genres")
+            powerbi_genre_count = cursor.fetchone()[0]
     if fact_count != report["valid_rating_rows"]:
         raise ValueError(f"PostgreSQL fact count {fact_count} differs from Spark {report['valid_rating_rows']}")
     if movie_count != report["movie_rows"] or metric_count != movie_count:
         raise ValueError(f"PostgreSQL movie counts differ: dimensions={movie_count}, metrics={metric_count}")
-    print(f"PostgreSQL verified: {fact_count} ratings, {movie_count} movies")
+    if powerbi_movie_count != movie_count or powerbi_year_count == 0 or powerbi_genre_count == 0:
+        raise ValueError("Power BI views are missing or have unexpected row counts")
+    if powerbi_rating_count != fact_count:
+        raise ValueError(f"Power BI total {powerbi_rating_count} differs from fact count {fact_count}")
+    print(f"PostgreSQL verified: {fact_count} ratings, {movie_count} movies, "
+          f"{powerbi_year_count} release years, {powerbi_genre_count} genre/year rows")
 
 
 with DAG(
@@ -93,5 +114,6 @@ with DAG(
     validate_output = PythonOperator(task_id="validate_output", python_callable=check_quality)
     load_postgres = PythonOperator(task_id="load_postgres", python_callable=load_database)
     validate_database = PythonOperator(task_id="validate_database", python_callable=check_database)
+    enrich_external = PythonOperator(task_id="enrich_external", python_callable=load_external_sources)
 
-    verify_sources >> extract_movielens >> spark_transform >> validate_output >> load_postgres >> validate_database
+    verify_sources >> extract_movielens >> spark_transform >> validate_output >> load_postgres >> validate_database >> enrich_external
