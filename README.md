@@ -11,6 +11,7 @@
 - มี PostgreSQL views สำหรับเชื่อม Power BI; HDFS, Hive และ Trino เป็นขั้นโครงสร้างพื้นฐานถัดไปหากวิชากำหนด
 - ดึงข้อมูลเพิ่มจาก Wikipedia ด้วย web scraping และ Wikidata ผ่าน API เพื่อใช้วิเคราะห์รายได้และประเทศต้นทางของหนัง
 - มี [ตัวอย่าง CSV จาก web scraping ของ Wikipedia](data/scraped/wikipedia_highest_grossing.csv) ใน Git พร้อม [แหล่งที่มาและเงื่อนไขการใช้](data/scraped/README.md)
+- มี [CSV ผล Wikidata API](data/api/wikidata_films.csv) ใน Git พร้อม [รายละเอียด snapshot และเงื่อนไขการใช้](data/api/README.md)
 - นำเข้าชุดข้อมูลผู้เข้าชิงและผู้ชนะ Oscar จากไฟล์ Oscars-Data ซึ่งผู้เผยแพร่รวบรวมจากเว็บ Academy
 
 ## รันครั้งแรกบนเครื่องใหม่

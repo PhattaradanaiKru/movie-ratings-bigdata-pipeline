@@ -60,7 +60,7 @@ services:
 
   data-init:
     image: postgres:16
-    command: ["sh", "-c", "mkdir -p /workspace/data/raw /workspace/data/processed /workspace/data/scraped && chmod 0777 /workspace/data/raw /workspace/data/processed /workspace/data/scraped"]
+    command: ["sh", "-c", "mkdir -p /workspace/data/raw /workspace/data/processed /workspace/data/scraped /workspace/data/api && chmod 0777 /workspace/data/raw /workspace/data/processed /workspace/data/scraped /workspace/data/api"]
     volumes:
       - ./data:/workspace/data
     restart: "no"

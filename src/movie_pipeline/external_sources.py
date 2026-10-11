@@ -289,7 +289,7 @@ def publish(db, grosses, wikidata, oscars, api_snapshots: list[Path]) -> dict[st
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--step", choices=("all", "wikipedia", "wikidata", "oscars", "publish",
-                                           "export-wikipedia"),
+                                           "export-wikipedia", "export-wikidata"),
                         default="all", help="Run one Airflow stage or the full standalone refresh")
     parser.add_argument("--api-limit", type=int, default=None,
                         help="Optional development limit; default queries every IMDb ID")
@@ -312,6 +312,26 @@ def main() -> None:
             writer.writerows(scrape_grosses(html))
         temporary.replace(destination)
         print(f"Exported scraped Wikipedia rows to {destination}")
+        return
+    if args.step == "export-wikidata":
+        with closing(connection()) as db:
+            ids = selected_imdb_ids(db, args.api_limit)
+        paths = [wikidata_snapshot_path(ids[offset:offset + args.api_batch_size],
+                                        offset // args.api_batch_size)
+                 for offset in range(0, len(ids), args.api_batch_size)]
+        missing = [path for path in paths if not path.is_file()]
+        if missing:
+            raise FileNotFoundError(f"Missing {len(missing)} Wikidata snapshots; run --step wikidata first")
+        rows = fetch_wikidata(ids, batch_size=args.api_batch_size)
+        destination = ROOT / "data" / "api" / "wikidata_films.csv"
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        temporary = destination.with_suffix(".csv.part")
+        with temporary.open("w", encoding="utf-8", newline="") as output:
+            writer = csv.writer(output, lineterminator="\n")
+            writer.writerow(("imdb_id", "wikidata_id", "country_of_origin"))
+            writer.writerows(rows)
+        temporary.replace(destination)
+        print(f"Exported {len(rows)} cached Wikidata API rows to {destination}")
         return
     if args.step in ("all", "wikipedia"):
         html = snapshot(web_path, WIKIPEDIA_URL, accept="text/html")
