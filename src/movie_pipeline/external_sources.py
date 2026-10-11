@@ -98,9 +98,13 @@ def scrape_grosses(html: bytes) -> list[tuple[int, str, int, int]]:
         rows = []
         for tr in table.select("tr"):
             cells = tr.find_all(["th", "td"], recursive=False)
-            if len(cells) < 5 or not cells[0].get_text(" ", strip=True).isdigit():
+            if len(cells) < 5:
                 continue
-            rank = int(cells[0].get_text(" ", strip=True))
+            rank_text = cells[0].get_text(" ", strip=True)
+            rank_match = re.match(r"^(\d+)\b", rank_text)
+            if not rank_match:
+                continue
+            rank = int(rank_match.group(1))
             title = cells[2].get_text(" ", strip=True).rstrip(" †‡*")
             gross_text = cells[3].get_text(" ", strip=True)
             year_text = cells[4].get_text(" ", strip=True)
@@ -108,8 +112,8 @@ def scrape_grosses(html: bytes) -> list[tuple[int, str, int, int]]:
             year = re.search(r"\b(19|20)\d{2}\b", year_text)
             if gross and year and title:
                 rows.append((rank, title, int(gross.group(1).replace(",", "")), int(year.group())))
-        if not rows or len({row[0] for row in rows}) != len(rows):
-            raise ValueError("Wikipedia gross table is empty or has duplicate ranks")
+        if not rows or sorted(row[0] for row in rows) != list(range(1, len(rows) + 1)):
+            raise ValueError("Wikipedia gross table is empty or has missing/duplicate ranks")
         return rows
     raise ValueError("Wikipedia highest-grossing table not found")
 

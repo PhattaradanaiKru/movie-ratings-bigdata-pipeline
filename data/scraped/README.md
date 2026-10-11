@@ -1,6 +1,6 @@
 # Wikipedia box-office scrape
 
-`wikipedia_highest_grossing.csv` contains 49 rows extracted from the “Highest-grossing films” table of [Wikipedia: List of highest-grossing films](https://en.wikipedia.org/wiki/List_of_highest-grossing_films). It contains rank, title, worldwide gross in USD, and release year. It does not contain MovieLens or IMDb ratings, Wikidata responses, or Oscar data.
+`wikipedia_highest_grossing.csv` contains 50 rows extracted from the “Highest-grossing films” table of [Wikipedia: List of highest-grossing films](https://en.wikipedia.org/wiki/List_of_highest-grossing_films). It contains rank, title, worldwide gross in USD, and release year. It does not contain MovieLens or IMDb ratings, Wikidata responses, or Oscar data.
 
 - Snapshot saved: 2026-10-11 10:35:09 UTC
 - Raw HTML SHA-256: `2eb8c4fd63a47509841c2a109896bbff6486c8a97f38c58087c4fa8dbaf0d4a9`
